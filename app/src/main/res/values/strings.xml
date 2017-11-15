@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">NavigaTour</string>
+    <string name="main_tsp">Go to TSP</string>
+    <string name="main_locate">Nearby Restaurants</string>
+
+    <string name="tsp_textView">Hello TSP</string>
+    <string name="locateNearby_textview">Hello Locate</string>
 </resources>

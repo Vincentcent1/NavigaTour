@@ -1,13 +1,15 @@
-package com.example.kohjingyu.navigatour;
+package com.example.android.navigatour;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+//import Gson;
+
+public class TSPActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_tsp);
     }
 }

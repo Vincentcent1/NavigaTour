@@ -16,7 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TSPActivity"></activity>
+        <activity android:name=".TSPActivity"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".LocateNearbyActivity"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>
