@@ -3,6 +3,8 @@ package com.example.kohjingyu.navigatour;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+//import Gson;
+
 public class TSPActivity extends AppCompatActivity {
 
     @Override
