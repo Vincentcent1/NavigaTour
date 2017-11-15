@@ -1,0 +1,37 @@
+{
+	"mbs": [{"name": "flyer", "public_cost": 0.83, "public_time": 17, "taxi_cost": 3.22, "taxi_time": 3, "foot_cost": 0, "foot_time": 14},
+						{"name": "vivo", "public_cost": 1.18, "public_time": 26, "taxi_cost": 6.96, "taxi_time": 14, "foot_cost": 0, "foot_time": 69},
+						{"name": "rws", "public_cost": 4.03, "public_time": 35, "taxi_cost": 8.5, "taxi_time": 19, "foot_cost": 0, "foot_time": 76},
+						{"name": "temple", "public_cost": 0.88, "public_time": 19, "taxi_cost": 4.98, "taxi_time": 8, "foot_cost": 0, "foot_time": 28},
+						{"name": "zoo", "public_cost": 1.96, "public_time": 84, "taxi_cost": 18.4, "taxi_time": 30, "foot_cost": 0, "foot_time": 269}],
+
+	"flyer": [{"name": "mbs", "public_cost": 0.83, "public_time": 17, "taxi_cost": 3.22, "taxi_time": 3, "foot_cost": 0, "foot_time": 14},
+					{"name": "vivo", "public_cost": 1.26, "public_time": 31, "taxi_cost": 7.84, "taxi_time": 13, "foot_cost": 0, "foot_time": 81},
+					{"name": "rws", "public_cost": 4.03, "public_time": 38, "taxi_cost": 9.38, "taxi_time": 18, "foot_cost": 0, "foot_time": 88},
+					{"name": "temple", "public_cost": 0.98, "public_time": 24, "taxi_cost": 4.76, "taxi_time": 8, "foot_cost": 0, "foot_time": 39},
+					{"name": "zoo", "public_cost": 1.89, "public_time": 85, "taxi_cost": 18.18, "taxi_time": 29, "foot_cost": 0, "foot_time": 264}],
+
+	"vivo": [{"name": "mbs", "public_cost": 1.18, "public_time": 26, "taxi_cost": 8.3, "taxi_time": 3, "foot_cost": 0, "foot_time": 69},
+					{"name": "flyer", "public_cost": 1.26, "public_time": 31, "taxi_cost": 7.96, "taxi_time": 14, "foot_cost": 0, "foot_time": 81},
+					{"name": "rws", "public_cost": 2, "public_time": 10, , "taxi_cost": 4.54, "taxi_time": 9, "foot_cost": 0, "foot_time": 12},
+					{"name": "temple", "public_cost": 0.98, "public_time": 18, "taxi_cost": 6.42, "taxi_time": 11, "foot_cost": 0, "foot_time": 47},
+					{"name": "zoo", "public_cost": 1.99, "public_time": 85, "taxi_cost": 22.58, "taxi_time": 31, "foot_cost": 0, "foot_time": 270}],
+
+	"rws": [{"name": "mbs", "public_cost": 1.18, "public_time": 33, "taxi_cost": 8.74, "taxi_time": 13, "foot_cost": 0, "foot_time": 76},
+					{"name": "flyer", "public_cost": 1.26, "public_time": 38, "taxi_cost": 8.40, "taxi_time": 14, "foot_cost": 0, "foot_time": 88},
+					{"name": "vivo", "public_cost": 0, "public_time": 10, , "taxi_cost": 3.22, "taxi_time": 4, "foot_cost": 0, "foot_time": 12},
+					{"name": "temple", "public_cost": 0.98, "public_time": 27, "taxi_cost": 6.64, "taxi_time": 12, "foot_cost": 0, "foot_time": 47},
+					{"name": "zoo", "public_cost": 1.99, "public_time": 92, "taxi_cost": 22.80, "taxi_time": 32, "foot_cost": 0, "foot_time": 270}],
+
+	"temple": [{"name": "mbs", "public_cost": 0.88, "public_time": 18, "taxi_cost": 5.32, "taxi_time": 7, "foot_cost": 0, "foot_time": 28},
+					{"name": "flyer", "public_cost": 0.98, "public_time": 23, "taxi_cost": 4.76, "taxi_time": 8, "foot_cost": 0, "foot_time": 39},
+					{"name": "vivo", "public_cost": 0.98, "public_time": 19, , "taxi_cost": 4.98, "taxi_time": 9, "foot_cost": 0, "foot_time": 47},
+					{"name": "rws", "public_cost": 3.98, "public_time": 28, "taxi_cost": 6.52, "taxi_time": 14, "foot_cost": 0, "foot_time": 55},
+					{"name": "zoo", "public_cost": 1.91, "public_time": 83, "taxi_cost": 18.40, "taxi_time": 30, "foot_cost": 0, "foot_time": 264}],
+
+	"zoo": [{"name": "mbs", "public_cost": 1.88, "public_time": 86, "taxi_cost": 22.48, "taxi_time": 32, "foot_cost": 0, "foot_time": 269},
+					{"name": "flyer", "public_cost": 1.96, "public_time": 87, "taxi_cost": 19.40, "taxi_time": 29, "foot_cost": 0, "foot_time": 264},
+					{"name": "vivo", "public_cost": 2.11, "public_time": 86, , "taxi_cost": 21.48, "taxi_time": 32, "foot_cost": 0, "foot_time": 270},
+					{"name": "rws", "public_cost": 4.99, "public_time": 96, "taxi_cost": 23.68, "taxi_time": 36, "foot_cost": 0, "foot_time": 285},
+					{"name": "temple", "public_cost": 1.91, "public_time": 84, "taxi_cost": 21.60, "taxi_time": 30, "foot_cost": 0, "foot_time": 264}]
+}
