@@ -4,6 +4,10 @@ import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -19,11 +23,88 @@ public class TSPActivity extends AppCompatActivity {
     int minTime; // TODO: Change to max int value
     double budgetRemaining;
     ArrayList<String> bestPath = new ArrayList<>();
+    ArrayList<String> attractions;
+    ArrayList<String> attractionNames;
+    ListView attractionsList;
+    ArrayAdapter<String> adapter;
 
-    public String loadAttractions(Context context) {
+    // Maximum attractions we perform brute force on is 5, as this produces a reasonably large time complexity
+    static final int BRUTE_THRESHOLD = 5;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_tsp);
+
+        getActionBar().setTitle("Select Attractions to Visit");
+
+        // Load attractions graph
+        String jsonString = loadJSON(this, "attractions.json");
+        activitiesG = new Gson().fromJson(jsonString, new TypeToken<HashMap<String,ArrayList<HashMap<String,String>>>>(){}.getType());
+
+        String attractionNamesString = loadJSON(this, "attractionNames.json");
+        HashMap<String, String> attractionNamesHash = new Gson().fromJson(attractionNamesString, new TypeToken<HashMap<String,String>>(){}.getType());
+
+        attractions = new ArrayList<>();
+        attractionNames = new ArrayList<>();
+
+        for(String key : attractionNamesHash.keySet()) {
+            if(!key.equals("mbs")) {
+                attractions.add(key);
+                attractionNames.add(attractionNamesHash.get(key));
+            }
+        }
+
+        attractionsList = (ListView)findViewById(R.id.attractionsList);
+
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, attractionNames);
+        attractionsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        attractionsList.setAdapter(adapter);
+    }
+
+    public void findRoute(View view) {
+        SparseBooleanArray checkedItems = attractionsList.getCheckedItemPositions();
+        ArrayList<String> attractionsToVisit = new ArrayList<String>();
+        for (int i = 0; i < checkedItems.size(); i++) {
+            int position = checkedItems.keyAt(i);
+            // Add attraction if it is checked
+            if (checkedItems.valueAt(i))
+                attractionsToVisit.add(attractions.get(position));
+        }
+
+        // Initialization
+        minTime = -1;
+        budgetRemaining = 0;
+        bestPath.clear();
+
+        String startLocation = "mbs";
+        ArrayList<String> path = new ArrayList<>();
+        path.add(startLocation);
+
+        // TODO: Determine which method to use based on the number of attractions
+
+        long started = System.nanoTime();
+        findBestPathBrute(attractionsToVisit, path, startLocation, "mbs", 10, 0);
+        System.out.println("Minimum time: " + minTime);
+        System.out.println(bestPath);
+        long time = System.nanoTime();
+        long timeTaken= time - started;
+        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+
+        started = System.nanoTime();
+        findBestPathNN(attractionsToVisit, path, startLocation, "mbs", 10, 0);
+        System.out.println("Minimum time: " + minTime);
+        System.out.println(bestPath);
+        time = System.nanoTime();
+        timeTaken= time - started;
+        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+    }
+
+    public String loadJSON(Context context, String fileName) {
         String json = null;
         try {
-            InputStream inputStream = context.getAssets().open("attractions.json");
+            InputStream inputStream = context.getAssets().open(fileName);
             int size = inputStream.available();
             byte[] buffer = new byte[size];
             inputStream.read(buffer);
@@ -85,116 +166,138 @@ public class TSPActivity extends AppCompatActivity {
                 bestPath = newPath;
             }
         }
+        else {
+            // Try all routes
+            for(int i = 0; i < attractions.size(); i ++) { // Loop V times
+                String newLocation = attractions.get(i);
+                ArrayList<String> newAttractions = (ArrayList<String>)attractions.clone();
+                newAttractions.remove(newLocation);
 
-        // Try all routes
-        for(int i = 0; i < attractions.size(); i ++) { // Loop V times
-            String newLocation = attractions.get(i);
-            ArrayList<String> newAttractions = (ArrayList<String>)attractions.clone();
-            newAttractions.remove(newLocation);
+                ArrayList<String> newPath = (ArrayList<String>)path.clone();
 
-            ArrayList<String> newPath = (ArrayList<String>)path.clone();
+                // Cost: O(V)
+                for(HashMap<String, String> neighbour : activitiesG.get(previous)) {
+                    if(neighbour.get("name").equals(newLocation)) {
+                        // Try all 3 possible modes of transport
+                        double taxiCost = Double.valueOf(neighbour.get("taxi_cost"));
+                        if(taxiCost <= budget) {
+                            double currentBudget = budget - taxiCost;
+                            int time = Integer.valueOf(neighbour.get("taxi_time"));
+                            newPath.add("taxi");
+                            newPath.add(newLocation);
+                            findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, currentBudget, currentTime+time);
+                        }
 
-            // Cost: O(V)
-            for(HashMap<String, String> neighbour : activitiesG.get(previous)) {
-                if(neighbour.get("name").equals(newLocation)) {
-                    // Try all 3 possible modes of transport
-                    double taxiCost = Double.valueOf(neighbour.get("taxi_cost"));
-                    if(taxiCost <= budget) {
-                        double currentBudget = budget - taxiCost;
-                        int time = Integer.valueOf(neighbour.get("taxi_time"));
-                        newPath.add("taxi");
+                        double publicCost = Double.valueOf(neighbour.get("public_cost"));
+                        if(publicCost <= budget) {
+                            double currentBudget = budget - publicCost;
+                            int time = Integer.valueOf(neighbour.get("public_time"));
+                            newPath.add("public");
+                            newPath.add(newLocation);
+                            findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, currentBudget, currentTime+time);
+                        }
+
+                        int time = Integer.valueOf(neighbour.get("foot_time"));
+                        newPath.add("foot");
                         newPath.add(newLocation);
-                        findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, currentBudget, currentTime+time);
+                        findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, budget, currentTime+time);
+
+                        break;
                     }
-
-                    double publicCost = Double.valueOf(neighbour.get("public_cost"));
-                    if(publicCost <= budget) {
-                        double currentBudget = budget - publicCost;
-                        int time = Integer.valueOf(neighbour.get("public_time"));
-                        newPath.add("public");
-                        newPath.add(newLocation);
-                        findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, currentBudget, currentTime+time);
-                    }
-
-                    int time = Integer.valueOf(neighbour.get("foot_time"));
-                    newPath.add("foot");
-                    newPath.add(newLocation);
-                    findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, budget, currentTime+time);
-
-                    break;
                 }
             }
         }
     }
 
     public void findBestPathNN(ArrayList<String> attractions, ArrayList<String> path, String previous, String finalLocation, double budget, int currentTime) {
-        // Finished the tour. Return to the final location
-        if(attractions.size() == 0) {
-            String currentLocation = previous;
-            ArrayList<HashMap<String,String>> neighbours = activitiesG.get(currentLocation);
-            int finalTime = currentTime;
-            double finalBudget = budget;
-
-            ArrayList<String> newPath = (ArrayList<String>)path.clone();
-
-            for(HashMap<String, String> neighbour : neighbours) {
-                if(neighbour.get("name").equals(finalLocation)) {
-                    // Find fastest way back that is within budget
-                    double taxiCost = Double.valueOf(neighbour.get("taxi_cost"));
-                    double publicCost = Double.valueOf(neighbour.get("public_cost"));
-                    if(taxiCost <= budget) {
-                        finalTime = currentTime + Integer.valueOf(neighbour.get("taxi_time"));
-                        finalBudget -= taxiCost;
-                        newPath.add("taxi");
-                    }
-                    else if(publicCost <= budget) {
-                        finalTime = currentTime + Integer.valueOf(neighbour.get("public_time"));
-                        finalBudget -= publicCost;
-                        newPath.add("public");
-                    }
-                    else {
-                        finalTime = currentTime + Integer.valueOf(neighbour.get("foot_time"));
-                        newPath.add("foot");
-                    }
-
-                    break;
-                }
-            }
-
-            newPath.add(finalLocation);
-            // If this is a better time or minTime is uninitialized, set minTime to this
-            if(finalTime < minTime || minTime == -1) {
-                minTime = finalTime;
-                budgetRemaining = budget;
-                bestPath = newPath;
-            }
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tsp);
-
-        // Load attractions graph
-        String jsonString = loadAttractions(this);
-        activitiesG = new Gson().fromJson(jsonString, new TypeToken<HashMap<String,ArrayList<HashMap<String,String>>>>(){}.getType());
-
+        // Approximate a solution to visit all attractions using the nearest neighbour algorithm
         // Initialization
         minTime = -1;
         budgetRemaining = 0;
+        bestPath.clear();
 
-        ArrayList<String> attractions = new ArrayList<>();
-        attractions.add("flyer");
-        attractions.add("vivo");
-        attractions.add("rws");
+        while(attractions.size() > 0) {
+            ArrayList<HashMap<String,String>> neighbours = activitiesG.get(previous);
 
-        String startLocation = "mbs";
-        ArrayList<String> path = new ArrayList<>();
-        path.add(startLocation);
+            // Find foot distances to every other point from current location
+            HashMap<String, HashMap<String, String>> neighbourInfo = new HashMap<>();
+            for(HashMap<String, String> neighbour : neighbours) {
+                neighbourInfo.put(neighbour.get("name"), neighbour);
+            }
 
-        findBestPathBrute(attractions, path, startLocation, "mbs", 0, 0);
-        System.out.println("Minimum time: " + minTime);
-        System.out.println(bestPath);
+            // Find nearest neighbour and travel to it using the fastest way within our budget
+            HashMap<String, String> nearestNeighbour = null;
+            int shortestDistance = -1;
+            for(String attraction : attractions) {
+                HashMap<String, String> currentAttraction = neighbourInfo.get(attraction);
+                int attractionDistance = Integer.valueOf(currentAttraction.get("foot_time"));
+                // Check if attraction is nearer
+                if(attractionDistance < shortestDistance || shortestDistance == -1) {
+                    nearestNeighbour = currentAttraction;
+                    shortestDistance = attractionDistance;
+                }
+            }
+
+            // Take the fastest way we can afford to the nearestNeighbour
+            double taxiCost = Double.valueOf(nearestNeighbour.get("taxi_cost"));
+            double publicCost = Double.valueOf(nearestNeighbour.get("public_cost"));
+            if(taxiCost <= budget) {
+                currentTime += Integer.valueOf(nearestNeighbour.get("taxi_time"));
+                budget -= taxiCost;
+                path.add("taxi");
+            }
+            else if(publicCost <= budget) {
+                currentTime += Integer.valueOf(nearestNeighbour.get("public_time"));
+                budget -= publicCost;
+                path.add("public");
+            }
+            else {
+                currentTime += Integer.valueOf(nearestNeighbour.get("foot_time"));
+                path.add("foot");
+            }
+
+            String nextLocation = nearestNeighbour.get("name");
+            path.add(nextLocation);
+            attractions.remove(nextLocation);
+            previous = nextLocation;
+        }
+
+        // Finished the tour. Return to the final location
+        int finalTime = currentTime;
+        double finalBudget = budget;
+        ArrayList<String> newPath = (ArrayList<String>)path.clone();
+
+        ArrayList<HashMap<String,String>> neighbours = activitiesG.get(previous);
+        for(HashMap<String, String> neighbour : neighbours) {
+            if(neighbour.get("name").equals(finalLocation)) {
+                // Find fastest way back that is within budget
+                double taxiCost = Double.valueOf(neighbour.get("taxi_cost"));
+                double publicCost = Double.valueOf(neighbour.get("public_cost"));
+                if(taxiCost <= budget) {
+                    finalTime = currentTime + Integer.valueOf(neighbour.get("taxi_time"));
+                    finalBudget -= taxiCost;
+                    newPath.add("taxi");
+                }
+                else if(publicCost <= budget) {
+                    finalTime = currentTime + Integer.valueOf(neighbour.get("public_time"));
+                    finalBudget -= publicCost;
+                    newPath.add("public");
+                }
+                else {
+                    finalTime = currentTime + Integer.valueOf(neighbour.get("foot_time"));
+                    newPath.add("foot");
+                }
+
+                break;
+            }
+        }
+
+        newPath.add(finalLocation);
+
+        // Set output to this
+        minTime = finalTime;
+        budgetRemaining = budget;
+        bestPath = newPath;
     }
+
 }

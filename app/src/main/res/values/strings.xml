@@ -5,4 +5,5 @@
 
     <string name="tsp_textView">Hello TSP</string>
     <string name="locateNearby_textview">Hello Locate</string>
+    <string name="title_activity_tspresults">Map</string>
 </resources>
