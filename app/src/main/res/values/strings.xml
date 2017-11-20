@@ -4,6 +4,6 @@
     <string name="main_locate">Nearby Restaurants</string>
 
     <string name="tsp_textView">Hello TSP</string>
-    <string name="locateNearby_textview">Hello Locate</string>
+    <string name="locateNearby_textview">Restaurants shown here</string>
     <string name="title_activity_tspresults">Map</string>
 </resources>
