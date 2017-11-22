@@ -10,9 +10,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    String[] bestPath;
+    ArrayList<Double> latitudes;
+    ArrayList<Double> longitudes;
+    ArrayList<String> transport;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +30,31 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        bestPath = getIntent().getStringArrayExtra("results");
+        latitudes = new ArrayList<>();
+        longitudes = new ArrayList<>();
+        transport = new ArrayList<>();
+
+        for(int i = 0; i < bestPath.length; i ++) {
+            if(i % 2 == 0) {
+                String[] latLng = bestPath[i].split(",");
+                double lat = Float.valueOf(latLng[0]);
+                double lng = Float.valueOf(latLng[1]);
+                latitudes.add(lat);
+                longitudes.add(lng);
+            }
+            else {
+                String transportStr = bestPath[i];
+                transport.add(transportStr);
+            }
+        }
+
+        System.out.println(latitudes);
+        System.out.println(longitudes);
+        System.out.println(transport);
+
+//        System.out.println("Best path: " + Arrays.toString(bestPath));
     }
 
 
@@ -39,8 +72,10 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        for(int i = 0; i < latitudes.size(); i ++) {
+            LatLng attraction = new LatLng(latitudes.get(i), longitudes.get(i));
+            mMap.addMarker(new MarkerOptions().position(attraction).title(String.valueOf(i)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(attraction));
+        }
     }
 }

@@ -1,13 +1,16 @@
 package com.example.android.navigatour;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -27,6 +30,7 @@ public class TSPActivity extends AppCompatActivity {
     ArrayList<String> attractionNames;
     ListView attractionsList;
     ArrayAdapter<String> adapter;
+    HashMap<String, HashMap<String, String>> attractionDataHash;
 
     // Maximum attractions we perform brute force on is 5, as this produces a reasonably large time complexity
     static final int BRUTE_THRESHOLD = 5;
@@ -36,22 +40,22 @@ public class TSPActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tsp);
 
-        getActionBar().setTitle("Select Attractions to Visit");
+//        getActionBar().setTitle("Select Attractions to Visit");
 
         // Load attractions graph
         String jsonString = loadJSON(this, "attractions.json");
         activitiesG = new Gson().fromJson(jsonString, new TypeToken<HashMap<String,ArrayList<HashMap<String,String>>>>(){}.getType());
 
         String attractionNamesString = loadJSON(this, "attractionNames.json");
-        HashMap<String, String> attractionNamesHash = new Gson().fromJson(attractionNamesString, new TypeToken<HashMap<String,String>>(){}.getType());
+        attractionDataHash = new Gson().fromJson(attractionNamesString, new TypeToken<HashMap<String,HashMap<String, String>>>(){}.getType());
 
         attractions = new ArrayList<>();
         attractionNames = new ArrayList<>();
 
-        for(String key : attractionNamesHash.keySet()) {
+        for(String key : attractionDataHash.keySet()) {
             if(!key.equals("mbs")) {
                 attractions.add(key);
-                attractionNames.add(attractionNamesHash.get(key));
+                attractionNames.add(attractionDataHash.get(key).get("name"));
             }
         }
 
@@ -82,23 +86,54 @@ public class TSPActivity extends AppCompatActivity {
         ArrayList<String> path = new ArrayList<>();
         path.add(startLocation);
 
-        // TODO: Determine which method to use based on the number of attractions
+        EditText budgetText = (EditText)findViewById(R.id.budgetText);
+        String budgetStr = budgetText.getText().toString();
 
-        long started = System.nanoTime();
-        findBestPathBrute(attractionsToVisit, path, startLocation, "mbs", 10, 0);
-        System.out.println("Minimum time: " + minTime);
-        System.out.println(bestPath);
-        long time = System.nanoTime();
-        long timeTaken= time - started;
-        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+        if(isNumeric(budgetStr)) {
+            double budget = Double.valueOf(budgetStr);
 
-        started = System.nanoTime();
-        findBestPathNN(attractionsToVisit, path, startLocation, "mbs", 10, 0);
-        System.out.println("Minimum time: " + minTime);
-        System.out.println(bestPath);
-        time = System.nanoTime();
-        timeTaken= time - started;
-        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+            // Determine which method to use based on the number of attractions
+            if(path.size() - 2 >= BRUTE_THRESHOLD) // We deduct 2 because we already know we start and end at mbs
+            {
+                //        long started = System.nanoTime();
+                //        System.out.println("Minimum time: " + minTime);
+                //        System.out.println(bestPath);
+                //        long time = System.nanoTime();
+                //        long timeTaken= time - started;
+                //        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+                findBestPathBrute(attractionsToVisit, path, startLocation, "mbs", budget, 0);
+            }
+            else {
+                //        started = System.nanoTime();
+                findBestPathNN(attractionsToVisit, path, startLocation, "mbs", budget, 0);
+                //        System.out.println("Minimum time: " + minTime);
+                //        System.out.println(bestPath);
+                //        time = System.nanoTime();
+                //        timeTaken= time - started;
+                //        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+            }
+
+            Intent intent = new Intent(this, TSPResultsActivity.class);
+            String[] bestPathArray = bestPath.toArray(new String[bestPath.size()]);
+
+            // Pass latLng values to map
+            for(int i = 0; i < bestPathArray.length; i++) {
+                HashMap<String, String> attraction = attractionDataHash.get(bestPathArray[i]);
+                if(attraction != null) {
+                    String latLng = attraction.get("latLng");
+                    bestPathArray[i] = latLng;
+                }
+            }
+
+            intent.putExtra("results", bestPathArray);
+            startActivity(intent);
+        }
+        else {
+            // Display error
+            Toast.makeText(this, "Please enter a number for your budget.", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
     public String loadJSON(Context context, String fileName) {
@@ -300,4 +335,18 @@ public class TSPActivity extends AppCompatActivity {
         bestPath = newPath;
     }
 
+    public static boolean isNumeric(String str)
+    {
+        // Checks if a String is numeric. Retrieved from https://stackoverflow.com/a/1102916
+
+        try
+        {
+            double d = Double.parseDouble(str);
+        }
+        catch(NumberFormatException nfe)
+        {
+            return false;
+        }
+        return true;
+    }
 }
