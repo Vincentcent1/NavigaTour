@@ -126,6 +126,7 @@ public class TSPActivity extends AppCompatActivity {
             }
 
             intent.putExtra("results", bestPathArray);
+            intent.putExtra("names", attractionNames.toArray(new String[attractionNames.size()]));
             startActivity(intent);
         }
         else {
