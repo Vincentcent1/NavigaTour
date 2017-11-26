@@ -38,6 +38,7 @@ public class LocateNearbyActivity extends AppCompatActivity{
     }
 
     public void onLocateClick(View view){
+        //Generate nearby restaurants on button click
         URL requestURL = null;
         try {
             requestURL = new URL("http://apir.viamichelin.com/apir/2/findPoi.xml/RESTAURANT/eng?center="+ "103.85" + ":"+ "1.29" + "&nb=10&dist=1000&source=RESGR&filter=AGG.provider%20eq%20RESGR&charset=UTF-8&ie=UTF-8&authKey=RESTGP20171120074056040173531595");
@@ -51,6 +52,7 @@ public class LocateNearbyActivity extends AppCompatActivity{
 
     }
 
+    //SAX Parser for Michelin website content
     public void parseRestaurant(InputSource is){
         try {
 
@@ -60,7 +62,6 @@ public class LocateNearbyActivity extends AppCompatActivity{
             DefaultHandler handler = new DefaultHandler() {
 
                 HashMap<String,String> individualData;
-                boolean bstartpoi = false;
                 boolean brname = false;
                 boolean baddress = false;
                 boolean bopeningtimes = false;

@@ -43,7 +43,8 @@
 
         <activity
             android:name=".TSPResultsActivity"
-            android:label="@string/title_activity_tspresults"></activity>
+            android:label="@string/title_activity_tspresults" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
