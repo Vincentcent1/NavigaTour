@@ -1,10 +1,20 @@
 package com.example.android.navigatour;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -29,19 +39,83 @@ import javax.xml.parsers.SAXParserFactory;
  * Created by setia on 11/15/2017.
  */
 
-public class LocateNearbyActivity extends AppCompatActivity{
-    ArrayList<HashMap<String,String >> allData =  new ArrayList<>();
+public class LocateNearbyActivity extends AppCompatActivity {
+    ArrayList<HashMap<String, String>> allData = new ArrayList<>();
+    private Location userLocation;
+    private final int LOCATION_PERMISSION_REQUEST = 1;
+    private boolean locationReady = false;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locate_nearby);
+
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getCurrentLocation();
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    Toast.makeText(this,"Setting Changi Airport as default location", Toast.LENGTH_LONG).show();
+                    userLocation = new Location("");
+                    userLocation.setLatitude(1.36);
+                    userLocation.setLongitude(103.99);
+                    locationReady = true;
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    public void getCurrentLocation(){
+        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request permission if app doesn't have permission yet
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_PERMISSION_REQUEST);
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null
+                        if (location != null) {
+                            userLocation = location;
+                            locationReady = true;
+                        }
+                    }
+                });
     }
 
     public void onLocateClick(View view){
         //Generate nearby restaurants on button click
+        getCurrentLocation();
+        ProgressBar progressBar = findViewById(R.id.locate_nearby_progressbar);
+        progressBar.setVisibility(View.VISIBLE);
+        while(!locationReady){
+            //wait
+        }
+        progressBar.setVisibility(View.GONE);
+        double longitude = userLocation.getLongitude();
+        double latitude = userLocation.getLatitude();
         URL requestURL = null;
         try {
-            requestURL = new URL("http://apir.viamichelin.com/apir/2/findPoi.xml/RESTAURANT/eng?center="+ "103.85" + ":"+ "1.29" + "&nb=10&dist=1000&source=RESGR&filter=AGG.provider%20eq%20RESGR&charset=UTF-8&ie=UTF-8&authKey=RESTGP20171120074056040173531595");
+            //center: <longitude>:<Latitude>
+            //Singapore: <103.85:1.29>
+            requestURL = new URL("http://apir.viamichelin.com/apir/2/findPoi.xml/RESTAURANT/eng?center="+ longitude + ":"+ latitude + "&nb=10&dist=1000&source=RESGR&filter=AGG.provider%20eq%20RESGR&charset=UTF-8&ie=UTF-8&authKey=RESTGP20171120074056040173531595");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
