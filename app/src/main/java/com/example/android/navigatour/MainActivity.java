@@ -1,6 +1,7 @@
 package com.example.android.navigatour;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -30,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
         return true;
+    }
+
+    public void simpleExplicitIntent(View view){
+        //TODO: replace view with url and call function from another activity
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://google.com"));
+        startActivity(intent);
     }
 
     public void startTSP(View view){
