@@ -38,7 +38,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Created by setia on 11/15/2017.
  */
-
+//To connect to emulator and do geofixing: telnet localhost <console-port>
 public class LocateNearbyActivity extends AppCompatActivity {
     ArrayList<HashMap<String, String>> allData = new ArrayList<>();
     private Location userLocation;
@@ -95,6 +95,11 @@ public class LocateNearbyActivity extends AppCompatActivity {
                         if (location != null) {
                             userLocation = location;
                             locationReady = true;
+                        } else {
+                            location = new Location("");
+                            location.setLongitude(103.85);
+                            location.setLatitude(1.29);
+                            locationReady = true;
                         }
                     }
                 });
@@ -107,6 +112,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         while(!locationReady){
             //wait
+
         }
         progressBar.setVisibility(View.GONE);
         double longitude = userLocation.getLongitude();
