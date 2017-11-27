@@ -16,6 +16,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.w3c.dom.Text;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -108,7 +109,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
     public void onLocateClick(View view){
         //Generate nearby restaurants on button click
         getCurrentLocation();
-        ProgressBar progressBar = findViewById(R.id.locate_nearby_progressbar);
+        ProgressBar progressBar = (ProgressBar)findViewById(R.id.locate_nearby_progressbar);
         progressBar.setVisibility(View.VISIBLE);
         while(!locationReady){
             //wait
@@ -239,7 +240,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
                 textDisplayed += "\n";
             }
         }
-        TextView restaurantTextView = findViewById(R.id.restaurantsTextView);
+        TextView restaurantTextView = (TextView)findViewById(R.id.restaurantsTextView);
         restaurantTextView.setText(textDisplayed);
     }
 

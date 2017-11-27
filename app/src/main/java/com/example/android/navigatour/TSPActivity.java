@@ -8,6 +8,7 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -90,28 +91,34 @@ public class TSPActivity extends AppCompatActivity {
         EditText budgetText = (EditText)findViewById(R.id.budgetText);
         String budgetStr = budgetText.getText().toString();
 
+        CheckBox wantOptimalCheckbox = (CheckBox)findViewById(R.id.wantOptimal);
+        boolean wantOptimal = wantOptimalCheckbox.isChecked();
+
         if(isNumeric(budgetStr)) {
             double budget = Double.valueOf(budgetStr);
 
-            // Determine which method to use based on the number of attractions
-            if(path.size() - 2 >= BRUTE_THRESHOLD) // We deduct 2 because we already know we start and end at mbs
+            // Determine which method to use based on user selection
+            // Or if the number of attractions is low, we use the brute force solution
+            if(wantOptimal || path.size() - 2 <= BRUTE_THRESHOLD) // We deduct 2 because we already know we start and end at mbs
             {
-                //        long started = System.nanoTime();
-                //        System.out.println("Minimum time: " + minTime);
-                //        System.out.println(bestPath);
-                //        long time = System.nanoTime();
-                //        long timeTaken= time - started;
-                //        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+                // Time duration taken
+                long started = System.nanoTime();
+                long time = System.nanoTime();
                 findBestPathBrute(attractionsToVisit, path, startLocation, "mbs", budget, 0);
+                System.out.println("Minimum time (brute force): " + minTime);
+                System.out.println(bestPath);
+                long timeTaken= time - started;
+                System.out.println("Time:" + timeTaken/1000000.0 + "ms");
             }
             else {
-                //        started = System.nanoTime();
+                // Nearest Neighbour approximation
+                long started = System.nanoTime();
                 findBestPathNN(attractionsToVisit, path, startLocation, "mbs", budget, 0);
-                //        System.out.println("Minimum time: " + minTime);
-                //        System.out.println(bestPath);
-                //        time = System.nanoTime();
-                //        timeTaken= time - started;
-                //        System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+                System.out.println("Minimum time (NN approximation): " + minTime);
+                System.out.println(bestPath);
+                long time = System.nanoTime();
+                long timeTaken= time - started;
+                System.out.println("Time:" + timeTaken/1000000.0 + "ms");
             }
 
             Intent intent = new Intent(this, TSPResultsActivity.class);
@@ -212,11 +219,9 @@ public class TSPActivity extends AppCompatActivity {
         else {
             // Try all routes
             for(int i = 0; i < attractions.size(); i ++) { // Loop V times
-                String newLocation = attractions.get(i);
                 ArrayList<String> newAttractions = (ArrayList<String>)attractions.clone();
+                String newLocation = newAttractions.get(i);
                 newAttractions.remove(newLocation);
-
-                ArrayList<String> newPath = (ArrayList<String>)path.clone();
 
                 // Cost: O(V)
                 for(HashMap<String, String> neighbour : activitiesG.get(previous)) {
@@ -226,20 +231,23 @@ public class TSPActivity extends AppCompatActivity {
                         if(taxiCost <= budget) {
                             double currentBudget = budget - taxiCost;
                             int time = Integer.valueOf(neighbour.get("taxi_time"));
-                            newPath.add("taxi");
-                            newPath.add(newLocation);
-                            findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, currentBudget, currentTime+time);
+                            ArrayList<String> newTaxiPath = (ArrayList<String>)path.clone();
+                            newTaxiPath.add("taxi");
+                            newTaxiPath.add(newLocation);
+                            findBestPathBrute(newAttractions, newTaxiPath, newLocation, finalLocation, currentBudget, currentTime+time);
                         }
 
                         double publicCost = Double.valueOf(neighbour.get("public_cost"));
                         if(publicCost <= budget) {
                             double currentBudget = budget - publicCost;
                             int time = Integer.valueOf(neighbour.get("public_time"));
-                            newPath.add("public");
-                            newPath.add(newLocation);
-                            findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, currentBudget, currentTime+time);
+                            ArrayList<String> newPublicPath = (ArrayList<String>)path.clone();
+                            newPublicPath.add("public");
+                            newPublicPath.add(newLocation);
+                            findBestPathBrute(newAttractions, newPublicPath, newLocation, finalLocation, currentBudget, currentTime+time);
                         }
 
+                        ArrayList<String> newPath = (ArrayList<String>)path.clone();
                         int time = Integer.valueOf(neighbour.get("foot_time"));
                         newPath.add("foot");
                         newPath.add(newLocation);
