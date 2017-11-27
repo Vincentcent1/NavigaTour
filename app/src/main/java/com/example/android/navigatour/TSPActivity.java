@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class TSPActivity extends AppCompatActivity {
@@ -115,6 +116,7 @@ public class TSPActivity extends AppCompatActivity {
 
             Intent intent = new Intent(this, TSPResultsActivity.class);
             String[] bestPathArray = bestPath.toArray(new String[bestPath.size()]);
+            String[] attractionNamesArray = new String[bestPathArray.length];
 
             // Pass latLng values to map
             for(int i = 0; i < bestPathArray.length; i++) {
@@ -122,11 +124,16 @@ public class TSPActivity extends AppCompatActivity {
                 if(attraction != null) {
                     String latLng = attraction.get("latLng");
                     bestPathArray[i] = latLng;
+
+                    if(i % 2 == 0) {
+                        String attractionName = attraction.get("name");
+                        attractionNamesArray[i/2] = attractionName;
+                    }
                 }
             }
 
             intent.putExtra("results", bestPathArray);
-            intent.putExtra("names", attractionNames.toArray(new String[attractionNames.size()]));
+            intent.putExtra("names", attractionNamesArray);
             startActivity(intent);
         }
         else {
