@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_dark_theme"
+        android:title="Dark Theme"
+        android:defaultValue="false" />
+    <CheckBoxPreference
+        android:key="pref_mute"
+        android:title="Mute"
+        android:defaultValue="false" />
+    <EditTextPreference
+        android:key="pref_text_size"
+        android:title="Text Size"
+        android:defaultValue="14"/>
+    <ListPreference
+        android:key="pref_language"
+        android:title="Language"
+        android:entries="@array/language"
+        android:entryValues="@array/language"
+        android:defaultValue="English"
+        />
+</PreferenceScreen>

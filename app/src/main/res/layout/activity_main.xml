@@ -16,6 +16,7 @@
         android:onClick="startTSP"/>
 
     <Button
+        android:id="@+id/main_button_nearby"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -23,5 +24,14 @@
         app:layout_constraintTop_toBottomOf="@id/main_button_tsp"
         android:text="@string/main_locate"
         android:onClick="startLocateNearby"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_button_nearby"
+        android:text="Implicit intent"
+        android:onClick="simpleExplicitIntent"/>
 
 </android.support.constraint.ConstraintLayout>
