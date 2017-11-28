@@ -8,6 +8,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,11 +35,21 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
 
     private GoogleMap mMap;
     String[] bestPath;
+    int[] bestTime;
+    double[] bestCost;
     String[] names;
     ArrayList<LatLng> locations;
     ArrayList<String> transport;
 
+    // This is the Adapter being used to display the list's data
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     GMapV2Direction md = new GMapV2Direction();
+
+    public TSPResultsActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +60,19 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mRecyclerView = (RecyclerView) findViewById(R.id.attractionsView);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // Get results passed in by TSPActivity
         bestPath = getIntent().getStringArrayExtra("results");
+        bestCost = getIntent().getDoubleArrayExtra("cost");
+        bestTime = getIntent().getIntArrayExtra("time");
         names = getIntent().getStringArrayExtra("names");
         locations = new ArrayList<>();
         transport = new ArrayList<>();
 
+        // Create locations based on lat lng strings
         for(int i = 0; i < bestPath.length; i ++) {
             if(i % 2 == 0) {
                 String[] latLng = bestPath[i].split(",");
@@ -78,6 +101,9 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        ArrayList<String> markerNamesList = new ArrayList<>(); // For map markers
+        ArrayList<String> listNamesList = new ArrayList<>(); // For RecyclerView
+
         // Display markers for each attraction
         for(int i = 0; i < locations.size(); i ++) {
             LatLng attraction = locations.get(i);
@@ -98,7 +124,37 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
                     break;
             }
 
+            // Format string accordingly and add to array for the RecyclerView
+            String transportTitle = ".";
+            if(i > 0) {
+                transportTitle = transport.get(i-1);
+
+                // Format string intuitively
+                if(transportTitle.equals("public")) {
+                    transportTitle = "Take public transport to ";
+                }
+                else if(transportTitle.equals("taxi")) {
+                    transportTitle = "Take a taxi to ";
+                }
+                else {
+                    // Foot
+                    transportTitle = "Walk to ";
+                }
+
+                transportTitle += names[i] + ". Cost: $" + String.valueOf(bestCost[i-1]) + ". Time taken: " + String.valueOf(bestTime[i-1]) + " mins";
+            }
+            else {
+                transportTitle = names[i];
+            }
+
+            // Add to appropriate arrays
             String markerTitle = String.valueOf(i+1) + numberSuffix + " stop: " + names[i];
+            String listTitle = String.valueOf(i+1) + numberSuffix + " stop: " + transportTitle;
+
+            markerNamesList.add(markerTitle);
+            listNamesList.add(listTitle);
+
+            //markerNamesList.add(transportTitle);
             Marker marker = mMap.addMarker(new MarkerOptions().position(attraction).title(markerTitle));
             marker.showInfoWindow();
 
@@ -108,6 +164,10 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         }
+
+        // Set as RecyclerView adapter
+        mAdapter = new MyAdapter(listNamesList.toArray(new String[listNamesList.size()]));
+        mRecyclerView.setAdapter(mAdapter);
 
         // Draw paths between each location
         drawPath();
@@ -126,6 +186,7 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
             this.fromLocation = fromLocation;
             this.toLocation = toLocation;
 
+            // Draw route with color based on transport mode
             if(transport.equals("taxi")) {
                 this.transport = GMapV2Direction.MODE_DRIVING;
                 this.color = Color.parseColor("#60A3F4");
@@ -144,8 +205,9 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
         protected Document doInBackground(Void... params) {
             doc = md.getDocument(this.fromLocation, this.toLocation, this.transport);
 
+            // Draw path
             ArrayList<LatLng> directionPoint = md.getDirection(doc);
-            rectLine = new PolylineOptions().width(7).color(this.color);
+            rectLine = new PolylineOptions().width(12).color(this.color);
 
             for(int i = 0 ; i < directionPoint.size() ; i++) {
                 rectLine.add(directionPoint.get(i));
@@ -173,5 +235,54 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
             new showRoute(location1, location2, currentTransport).execute();
         }
     }
+
+    class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+        private String[] mDataset;
+
+        // Provide a reference to the views for each data item
+        // Complex data items may need more than one view per item, and
+        // you provide access to all the views for a data item in a view holder
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            // each data item is just a string in this case
+            public TextView mTextView;
+            public ViewHolder(TextView v) {
+                super(v);
+                mTextView = v;
+            }
+        }
+
+        // Provide a suitable constructor (depends on the kind of dataset)
+        public MyAdapter(String[] myDataset) {
+            mDataset = myDataset;
+        }
+
+        // Create new views (invoked by the layout manager)
+        @Override
+        public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                       int viewType) {
+            // create a new view
+            TextView v = (TextView) LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.tsp_recycler_layout, parent, false);
+            // set the view's size, margins, paddings and layout parameters
+            ViewHolder vh = new ViewHolder(v);
+            return vh;
+        }
+
+        // Replace the contents of a view (invoked by the layout manager)
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            // - get element from your dataset at this position
+            // - replace the contents of the view with that element
+            holder.mTextView.setText(mDataset[position]);
+
+        }
+
+        // Return the size of your dataset (invoked by the layout manager)
+        @Override
+        public int getItemCount() {
+            return mDataset.length;
+        }
+    }
+
 }
 

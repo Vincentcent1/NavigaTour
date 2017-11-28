@@ -25,9 +25,13 @@ import java.util.HashMap;
 
 public class TSPActivity extends AppCompatActivity {
     HashMap<String,ArrayList<HashMap<String,String>>> activitiesG;
-    int minTime; // TODO: Change to max int value
+    int minTime;
     double budgetRemaining;
+
+    // Final results are stored in these arrays
     ArrayList<String> bestPath = new ArrayList<>();
+    ArrayList<Double> bestCost = new ArrayList<>();
+    ArrayList<Integer> bestTime = new ArrayList<>();
     ArrayList<String> attractions;
     ArrayList<String> attractionNames;
     ListView attractionsList;
@@ -42,9 +46,7 @@ public class TSPActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tsp);
 
-//        getActionBar().setTitle("Select Attractions to Visit");
-
-        // Load attractions graph
+        // Load attractions graph from JSON
         String jsonString = loadJSON(this, "attractions.json");
         activitiesG = new Gson().fromJson(jsonString, new TypeToken<HashMap<String,ArrayList<HashMap<String,String>>>>(){}.getType());
 
@@ -54,6 +56,7 @@ public class TSPActivity extends AppCompatActivity {
         attractions = new ArrayList<>();
         attractionNames = new ArrayList<>();
 
+        // Process attraction data from other JSON files
         for(String key : attractionDataHash.keySet()) {
             if(!key.equals("mbs")) {
                 attractions.add(key);
@@ -63,6 +66,7 @@ public class TSPActivity extends AppCompatActivity {
 
         attractionsList = (ListView)findViewById(R.id.attractionsList);
 
+        // Set checklist to use the attraction names
         adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_multiple_choice, attractionNames);
         attractionsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -70,6 +74,7 @@ public class TSPActivity extends AppCompatActivity {
     }
 
     public void findRoute(View view) {
+        // Find all attractions the user wants to visit
         SparseBooleanArray checkedItems = attractionsList.getCheckedItemPositions();
         ArrayList<String> attractionsToVisit = new ArrayList<String>();
         for (int i = 0; i < checkedItems.size(); i++) {
@@ -83,9 +88,14 @@ public class TSPActivity extends AppCompatActivity {
         minTime = -1;
         budgetRemaining = 0;
         bestPath.clear();
+        bestCost.clear();
+        bestTime.clear();
 
+        // Initialization: Assume user starts at MBS
         String startLocation = "mbs";
         ArrayList<String> path = new ArrayList<>();
+        ArrayList<Integer> timeArray = new ArrayList<>();
+        ArrayList<Double> cost = new ArrayList<>();
         path.add(startLocation);
 
         EditText budgetText = (EditText)findViewById(R.id.budgetText);
@@ -104,7 +114,7 @@ public class TSPActivity extends AppCompatActivity {
                 // Time duration taken
                 long started = System.nanoTime();
                 long time = System.nanoTime();
-                findBestPathBrute(attractionsToVisit, path, startLocation, "mbs", budget, 0);
+                findBestPathBrute(attractionsToVisit, path, cost, timeArray, startLocation, "mbs", budget, 0);
                 System.out.println("Minimum time (brute force): " + minTime);
                 System.out.println(bestPath);
                 long timeTaken= time - started;
@@ -113,7 +123,7 @@ public class TSPActivity extends AppCompatActivity {
             else {
                 // Nearest Neighbour approximation
                 long started = System.nanoTime();
-                findBestPathNN(attractionsToVisit, path, startLocation, "mbs", budget, 0);
+                findBestPathNN(attractionsToVisit, path, cost, timeArray, startLocation, "mbs", budget, 0);
                 System.out.println("Minimum time (NN approximation): " + minTime);
                 System.out.println(bestPath);
                 long time = System.nanoTime();
@@ -121,8 +131,11 @@ public class TSPActivity extends AppCompatActivity {
                 System.out.println("Time:" + timeTaken/1000000.0 + "ms");
             }
 
+            // Prepare results for result display view
             Intent intent = new Intent(this, TSPResultsActivity.class);
             String[] bestPathArray = bestPath.toArray(new String[bestPath.size()]);
+            Double[] bestCostArray = bestCost.toArray(new Double[bestCost.size()]);
+            Integer[] bestTimeArray = bestTime.toArray(new Integer[bestTime.size()]);
             String[] attractionNamesArray = new String[bestPathArray.length];
 
             // Pass latLng values to map
@@ -139,7 +152,18 @@ public class TSPActivity extends AppCompatActivity {
                 }
             }
 
+            int[] bestPrimitiveTimeArray = new int[bestTimeArray.length];
+            double[] bestPrimitiveCostArray = new double[bestCostArray.length];
+
+            for(int i = 0; i < bestTimeArray.length; i ++ ) {
+                bestPrimitiveTimeArray[i] = bestTimeArray[i];
+                bestPrimitiveCostArray[i] = bestCostArray[i];
+            }
+
+            // Pass results to result display view
             intent.putExtra("results", bestPathArray);
+            intent.putExtra("time", bestPrimitiveTimeArray);
+            intent.putExtra("cost", bestPrimitiveCostArray);
             intent.putExtra("names", attractionNamesArray);
             startActivity(intent);
         }
@@ -168,7 +192,7 @@ public class TSPActivity extends AppCompatActivity {
         return json;
     }
 
-    public void findBestPathBrute(ArrayList<String> attractions, ArrayList<String> path, String previous, String finalLocation, double budget, int currentTime) {
+    public void findBestPathBrute(ArrayList<String> attractions, ArrayList<String> path, ArrayList<Double> cost, ArrayList<Integer> time, String previous, String finalLocation, double budget, int currentTime) {
         /*
         *  Find the best order to visit all attractions by iterating through all possible routes and transport modes.
         *  This is O(n! * m^(n-1)) where n is the number of attractions, and m is the number of transport modes
@@ -183,6 +207,8 @@ public class TSPActivity extends AppCompatActivity {
             double finalBudget = budget;
 
             ArrayList<String> newPath = (ArrayList<String>)path.clone();
+            ArrayList<Double> newCost = (ArrayList<Double>)cost.clone();
+            ArrayList<Integer> newTime = (ArrayList<Integer>)time.clone();
 
             for(HashMap<String, String> neighbour : neighbours) {
                 if(neighbour.get("name").equals(finalLocation)) {
@@ -190,18 +216,27 @@ public class TSPActivity extends AppCompatActivity {
                     double taxiCost = Double.valueOf(neighbour.get("taxi_cost"));
                     double publicCost = Double.valueOf(neighbour.get("public_cost"));
                     if(taxiCost <= budget) {
-                        finalTime = currentTime + Integer.valueOf(neighbour.get("taxi_time"));
+                        int taxiTime =  Integer.valueOf(neighbour.get("taxi_time"));
+                        finalTime = currentTime + taxiTime;
                         finalBudget -= taxiCost;
                         newPath.add("taxi");
+                        newCost.add(taxiCost);
+                        newTime.add(taxiTime);
                     }
                     else if(publicCost <= budget) {
-                        finalTime = currentTime + Integer.valueOf(neighbour.get("public_time"));
+                        int publicTime = Integer.valueOf(neighbour.get("public_time"));
+                        finalTime = currentTime + publicTime;
                         finalBudget -= publicCost;
                         newPath.add("public");
+                        newCost.add(publicCost);
+                        newTime.add(publicTime);
                     }
                     else {
-                        finalTime = currentTime + Integer.valueOf(neighbour.get("foot_time"));
+                        int footTime = Integer.valueOf(neighbour.get("foot_time"));
+                        finalTime = currentTime + footTime;
                         newPath.add("foot");
+                        newCost.add(0.0);
+                        newTime.add(footTime);
                     }
 
                     break;
@@ -214,6 +249,8 @@ public class TSPActivity extends AppCompatActivity {
                 minTime = finalTime;
                 budgetRemaining = budget;
                 bestPath = newPath;
+                bestCost = newCost;
+                bestTime = newTime;
             }
         }
         else {
@@ -230,28 +267,46 @@ public class TSPActivity extends AppCompatActivity {
                         double taxiCost = Double.valueOf(neighbour.get("taxi_cost"));
                         if(taxiCost <= budget) {
                             double currentBudget = budget - taxiCost;
-                            int time = Integer.valueOf(neighbour.get("taxi_time"));
+                            int taxiTime = Integer.valueOf(neighbour.get("taxi_time"));
                             ArrayList<String> newTaxiPath = (ArrayList<String>)path.clone();
+                            ArrayList<Double> newCost = (ArrayList<Double>)cost.clone();
+                            ArrayList<Integer> newTime = (ArrayList<Integer>)time.clone();
+
                             newTaxiPath.add("taxi");
                             newTaxiPath.add(newLocation);
-                            findBestPathBrute(newAttractions, newTaxiPath, newLocation, finalLocation, currentBudget, currentTime+time);
+                            newCost.add(taxiCost);
+                            newTime.add(taxiTime);
+
+                            findBestPathBrute(newAttractions, newTaxiPath, newCost, newTime, newLocation, finalLocation, currentBudget, currentTime+taxiTime);
                         }
 
                         double publicCost = Double.valueOf(neighbour.get("public_cost"));
                         if(publicCost <= budget) {
                             double currentBudget = budget - publicCost;
-                            int time = Integer.valueOf(neighbour.get("public_time"));
+                            int publicTime = Integer.valueOf(neighbour.get("public_time"));
                             ArrayList<String> newPublicPath = (ArrayList<String>)path.clone();
+                            ArrayList<Double> newCost = (ArrayList<Double>)cost.clone();
+                            ArrayList<Integer> newTime = (ArrayList<Integer>)time.clone();
+
                             newPublicPath.add("public");
                             newPublicPath.add(newLocation);
-                            findBestPathBrute(newAttractions, newPublicPath, newLocation, finalLocation, currentBudget, currentTime+time);
+                            newCost.add(publicCost);
+                            newTime.add(publicTime);
+
+                            findBestPathBrute(newAttractions, newPublicPath, newCost, newTime, newLocation, finalLocation, currentBudget, currentTime+publicTime);
                         }
 
                         ArrayList<String> newPath = (ArrayList<String>)path.clone();
-                        int time = Integer.valueOf(neighbour.get("foot_time"));
+                        ArrayList<Double> newCost = (ArrayList<Double>)cost.clone();
+                        ArrayList<Integer> newTime = (ArrayList<Integer>)time.clone();
+
+                        int footTime = Integer.valueOf(neighbour.get("foot_time"));
                         newPath.add("foot");
                         newPath.add(newLocation);
-                        findBestPathBrute(newAttractions, newPath, newLocation, finalLocation, budget, currentTime+time);
+                        newCost.add(0.0);
+                        newTime.add(footTime);
+
+                        findBestPathBrute(newAttractions, newPath, newCost, newTime, newLocation, finalLocation, budget, currentTime+footTime);
 
                         break;
                     }
@@ -260,12 +315,14 @@ public class TSPActivity extends AppCompatActivity {
         }
     }
 
-    public void findBestPathNN(ArrayList<String> attractions, ArrayList<String> path, String previous, String finalLocation, double budget, int currentTime) {
+    public void findBestPathNN(ArrayList<String> attractions, ArrayList<String> path, ArrayList<Double> cost, ArrayList<Integer> time, String previous, String finalLocation, double budget, int currentTime) {
         // Approximate a solution to visit all attractions using the nearest neighbour algorithm
         // Initialization
         minTime = -1;
         budgetRemaining = 0;
         bestPath.clear();
+        bestCost.clear();
+        bestTime.clear();
 
         while(attractions.size() > 0) {
             ArrayList<HashMap<String,String>> neighbours = activitiesG.get(previous);
@@ -293,18 +350,27 @@ public class TSPActivity extends AppCompatActivity {
             double taxiCost = Double.valueOf(nearestNeighbour.get("taxi_cost"));
             double publicCost = Double.valueOf(nearestNeighbour.get("public_cost"));
             if(taxiCost <= budget) {
-                currentTime += Integer.valueOf(nearestNeighbour.get("taxi_time"));
+                int taxiTime = Integer.valueOf(nearestNeighbour.get("taxi_time"));
+                currentTime += taxiTime;
                 budget -= taxiCost;
                 path.add("taxi");
+                cost.add(taxiCost);
+                time.add(taxiTime);
             }
             else if(publicCost <= budget) {
-                currentTime += Integer.valueOf(nearestNeighbour.get("public_time"));
+                int publicTime = Integer.valueOf(nearestNeighbour.get("public_time"));
+                currentTime += publicTime;
                 budget -= publicCost;
                 path.add("public");
+                cost.add(publicCost);
+                time.add(publicTime);
             }
             else {
-                currentTime += Integer.valueOf(nearestNeighbour.get("foot_time"));
+                int footTime = Integer.valueOf(nearestNeighbour.get("foot_time"));
+                currentTime += footTime;
                 path.add("foot");
+                cost.add(0.0);
+                time.add(footTime);
             }
 
             String nextLocation = nearestNeighbour.get("name");
@@ -317,6 +383,8 @@ public class TSPActivity extends AppCompatActivity {
         int finalTime = currentTime;
         double finalBudget = budget;
         ArrayList<String> newPath = (ArrayList<String>)path.clone();
+        ArrayList<Integer> newTime = (ArrayList<Integer>)time.clone();
+        ArrayList<Double> newCost = (ArrayList<Double>)cost.clone();
 
         ArrayList<HashMap<String,String>> neighbours = activitiesG.get(previous);
         for(HashMap<String, String> neighbour : neighbours) {
@@ -325,18 +393,27 @@ public class TSPActivity extends AppCompatActivity {
                 double taxiCost = Double.valueOf(neighbour.get("taxi_cost"));
                 double publicCost = Double.valueOf(neighbour.get("public_cost"));
                 if(taxiCost <= budget) {
-                    finalTime = currentTime + Integer.valueOf(neighbour.get("taxi_time"));
+                    int taxiTime = Integer.valueOf(neighbour.get("taxi_time"));
+                    finalTime = currentTime + taxiTime;
                     finalBudget -= taxiCost;
                     newPath.add("taxi");
+                    newTime.add(taxiTime);
+                    newCost.add(taxiCost);
                 }
                 else if(publicCost <= budget) {
-                    finalTime = currentTime + Integer.valueOf(neighbour.get("public_time"));
+                    int publicTime = Integer.valueOf(neighbour.get("public_time"));
+                    finalTime = currentTime + publicTime;
                     finalBudget -= publicCost;
                     newPath.add("public");
+                    newTime.add(publicTime);
+                    newCost.add(publicCost);
                 }
                 else {
-                    finalTime = currentTime + Integer.valueOf(neighbour.get("foot_time"));
+                    int footTime = Integer.valueOf(neighbour.get("foot_time"));
+                    finalTime = currentTime + footTime;
                     newPath.add("foot");
+                    newTime.add(footTime);
+                    newCost.add(0.0);
                 }
 
                 break;
@@ -349,6 +426,8 @@ public class TSPActivity extends AppCompatActivity {
         minTime = finalTime;
         budgetRemaining = budget;
         bestPath = newPath;
+        bestTime = newTime;
+        bestCost = newCost;
     }
 
     public static boolean isNumeric(String str)
