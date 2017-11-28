@@ -109,7 +109,7 @@ public class TSPActivity extends AppCompatActivity {
 
             // Determine which method to use based on user selection
             // Or if the number of attractions is low, we use the brute force solution
-            if(wantOptimal || path.size() - 2 <= BRUTE_THRESHOLD) // We deduct 2 because we already know we start and end at mbs
+            if(wantOptimal)// || path.size() - 2 <= BRUTE_THRESHOLD) // We deduct 2 because we already know we start and end at mbs
             {
                 // Time duration taken
                 long started = System.nanoTime();
