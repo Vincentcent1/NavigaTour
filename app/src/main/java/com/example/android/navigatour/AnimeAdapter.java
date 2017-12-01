@@ -4,8 +4,8 @@ package com.example.android.navigatour;
 
 //TODO 4.2 go back to activity_main.xml and put in the recycler view widget
 
-import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,17 +104,6 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
             //attach data to widgets
             restaurantTextView.setText(restaurantName);
 
-
-//            int resID = parentContext.getResources().getIdentifier(filename, typeOfResource, packageName);
-            //TODO 4.6 B pass the resource ID to the image widget
-//            picture.setImageResource(resID);
-
-            //TODO 4.6 C pass the character name to the characterName widget
-//            characterName.setText();
-
-            //TODO 4.6 D display the position number
-//            itemNumber.setText(String.valueOf(position));
-
         }
 
 
@@ -121,9 +111,18 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
-            AlertDialog.Builder builder
-                    = new AlertDialog.Builder(parentContext);
-
+            RecyclerActivity.AnimeJsonData animeJsonData = data.get(clickedPosition);
+            ArrayList<String> arrayList = new ArrayList<>();
+            arrayList.add(animeJsonData.getName());
+            arrayList.add(animeJsonData.getAddress());
+            arrayList.add(animeJsonData.getMealprice());
+            arrayList.add(animeJsonData.getOpeningtimes());
+            arrayList.add(animeJsonData.getWebsite());
+            Toast.makeText(parentContext,String.valueOf(clickedPosition),Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(parentContext,RestaurantInfo.class);
+            intent.putExtra("IMAGEURL", animeJsonData.getImageUrl());
+            intent.putExtra("RESTAURANT", arrayList);
+            parentContext.startActivity(intent);
         }
     }
 

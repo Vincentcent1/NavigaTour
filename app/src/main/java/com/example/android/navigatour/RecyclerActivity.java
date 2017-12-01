@@ -21,7 +21,7 @@ public class RecyclerActivity extends AppCompatActivity {
 
     ArrayList<AnimeJsonData> animeJsonData = new ArrayList<>();
 //    private ArrayList<>
-    private RecyclerView animeList;
+    private RecyclerView recyclerView;
     private AnimeAdapter mAnimeAdapter;
     private ArrayList<HashMap<String,String>> data;
 
@@ -56,16 +56,16 @@ public class RecyclerActivity extends AppCompatActivity {
         getImageTask.execute(urlss);
 
         //TODO 4.9 get a reference to the recycler view widget
-        animeList = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
         //TODO 4.10 create an instance of LinearLayoutManager and
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        animeList.setLayoutManager(linearLayoutManager);
+        recyclerView.setLayoutManager(linearLayoutManager);
         //          assign it to the recycler view object
         //TODO 4.11 create an instance of the Adapter and
         //          assign it to the recycler view object
         mAnimeAdapter = new AnimeAdapter(this, animeJsonData);
-        animeList.setAdapter(mAnimeAdapter);
+        recyclerView.setAdapter(mAnimeAdapter);
 
     }
 
@@ -83,14 +83,14 @@ public class RecyclerActivity extends AppCompatActivity {
     }
 
     //TODO 3.1 Create an inner class matching the keys of the JSON array
-    public class AnimeJsonData{
+    public static class AnimeJsonData{
 
         String name;
         String address;
         String openingtimes;
         String mealprice;
         String website;
-        String[] imageurl;
+        String[] imageurl = new String[4];
         Bitmap[] imageBitmap;
 
         public AnimeJsonData(HashMap<String,String> data){
@@ -102,8 +102,6 @@ public class RecyclerActivity extends AppCompatActivity {
             this.imageurl = data.get("imageurl").split(" ");
             this.imageBitmap = new Bitmap[imageurl.length];
         }
-
-
 
         public String getName() {
             return name;
@@ -142,7 +140,7 @@ public class RecyclerActivity extends AppCompatActivity {
         }
     }
 
-    private URL[] convertStringToUrl(String[] strings){
+    public static URL[] convertStringToUrl(String[] strings){
         URL[] urls = new URL[strings.length];
         String tempStrings;
         int counter = 0;
