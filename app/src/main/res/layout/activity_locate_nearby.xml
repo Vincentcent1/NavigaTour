@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true">
 
     <TextView
         android:id="@+id/restaurantsTextView"
@@ -22,33 +16,10 @@
         android:text="@string/locateNearby_textview"
         android:layout_weight="1"/>
 
-    <EditText
-        android:id="@+id/longitude"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
-
-    <EditText
-        android:id="@+id/latitude"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Locate"
         android:layout_weight="1"
         android:onClick="onLocateClick"/>
-
-    </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/locate_nearby_progressbar"
-        style="?android:attr/progressBarStyleLarge"
-        android:visibility="invisible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        />
-</RelativeLayout>
+</LinearLayout>
