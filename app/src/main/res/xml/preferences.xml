@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
-        android:key="pref_dark_theme"
-        android:title="Dark Theme"
-        android:defaultValue="false" />
+        android:id="@+id/chkBoxLargeFont"
+        android:defaultValue="false"
+        android:key="checkBoxKey"
+        android:summaryOff="Normal"
+        android:summaryOn="Large"
+        android:title="@string/CBKtitle" />
     <CheckBoxPreference
-        android:key="pref_mute"
-        android:title="Mute"
-        android:defaultValue="false" />
-    <EditTextPreference
-        android:key="pref_text_size"
-        android:title="Text Size"
-        android:defaultValue="14"/>
-    <ListPreference
-        android:key="pref_language"
-        android:title="Language"
-        android:entries="@array/language"
-        android:entryValues="@array/language"
-        android:defaultValue="English"
-        />
+        android:id="@+id/chkBoxYellow"
+        android:defaultValue="false"
+        android:key="checkBoxYellow"
+        android:summaryOff="@string/CBYoff"
+        android:summaryOn="@string/CBYon"
+        android:title="@string/CBYtitle"/>
+    <CheckBoxPreference
+        android:id="@+id/chkBoxChinese"
+        android:defaultValue="false"
+        android:key="checkBoxChinese"
+        android:title="@string/CBCtitle"/>
 </PreferenceScreen>

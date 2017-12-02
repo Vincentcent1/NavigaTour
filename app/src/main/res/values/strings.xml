@@ -7,8 +7,16 @@
     <string name="locateNearby_textview">Restaurants shown here</string>
     <string name="title_activity_tspresults">Map</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="menu_settings">Settings</string>
+    <string name="function3">Discover your tour around Singapore!</string>
+    <string name="checkBoxChinese">checkBoxChinese</string>
+    <string name="CBCtitle">"中文"</string>
+    <string name="checkBoxYellow">checkBoxYellow</string>
+    <string name="CBYtitle">Royal Theme</string>
+    <string name="CBYon">Yellow</string>
+    <string name="CBYoff">Red</string>
+    <string name="checkBoxKey">checkBoxKey</string>
+    <string name="CBKtitle">Larger Font</string>
+    <string name="CBKon">Large</string>
+    <string name="CBKoff">Normal</string>
 </resources>
