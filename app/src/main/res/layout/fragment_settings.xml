@@ -5,9 +5,23 @@
     tools:context="com.example.android.navigatour.SettingsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/myFont"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:name="com.example.android.navigatour.SettingsFragment" />
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/myTheme"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.example.android.navigatour.SettingsFragment" />
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/myLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.example.android.navigatour.SettingsFragment" />
 
 </FrameLayout>
