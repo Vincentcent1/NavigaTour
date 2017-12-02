@@ -20,7 +20,9 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -54,7 +56,7 @@ import javax.xml.parsers.SAXParserFactory;
  * Created by setia on 11/15/2017.
  */
 //To connect to emulator and do geofixing: telnet localhost <console-port>
-public class LocateNearbyActivity extends AppCompatActivity{
+public class LocateNearbyActivity extends AppCompatActivity {
     ArrayList<HashMap<String, String>> allData = new ArrayList<>();
     private Location userLocation;
     private final int LOCATION_PERMISSION_REQUEST = 1;
@@ -62,17 +64,30 @@ public class LocateNearbyActivity extends AppCompatActivity{
     private LocationManager locationManager;
     private String provider;
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationRequest mLocationRequest = new LocationRequest();
+    private LocationCallback mLocationCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locate_nearby);
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                userLocation = locationResult.getLastLocation();
+            }
+        };
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        getCurrentLocation();
+        createLocationRequest();
+//        getCurrentLocation();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
+        if (true) {
+            startLocationUpdates();
+        }
     }
 
     @Override
@@ -90,7 +105,7 @@ public class LocateNearbyActivity extends AppCompatActivity{
                     // contacts-related task you need to do.
 
                 } else {
-                    Toast.makeText(this,"Setting Changi Airport as default location", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Setting Changi Airport as default location", Toast.LENGTH_LONG).show();
                     userLocation = new Location("");
                     userLocation.setLatitude(1.36);
                     userLocation.setLongitude(103.99);
@@ -106,12 +121,12 @@ public class LocateNearbyActivity extends AppCompatActivity{
         }
     }
 
-    public void getCurrentLocation(){
+    public void getCurrentLocation() {
         //&& ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request permission if app doesn't have permission yet
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_PERMISSION_REQUEST);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_REQUEST);
             return;
         }
         mFusedLocationClient.getLastLocation()
@@ -134,16 +149,33 @@ public class LocateNearbyActivity extends AppCompatActivity{
                 });
     }
 
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+    }
+
     protected void createLocationRequest() {
-        LocationRequest mLocationRequest = new LocationRequest();
+
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
+        //Check whether current location settings are satisfied
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
         task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
@@ -227,6 +259,8 @@ public class LocateNearbyActivity extends AppCompatActivity{
                 boolean bmealprice = false;
                 boolean bweb = false;
                 boolean burl = false;
+                boolean bdescription = false;
+                boolean bstars = false;
 
                 public void startElement(String uri, String localName,
                                          String qName, Attributes attributes)
@@ -257,8 +291,13 @@ public class LocateNearbyActivity extends AppCompatActivity{
                         bweb = true;
                     }
                     if (qName.equalsIgnoreCase("URL_XL")){
-
                         burl = true;
+                    }
+                    if (qName.equalsIgnoreCase("DESCRIPTION")){
+                        bdescription = true;
+                    }
+                    if (qName.equalsIgnoreCase("MICHELIN_STARS")){
+                        bstars = true;
                     }
                 }
 
@@ -281,39 +320,39 @@ public class LocateNearbyActivity extends AppCompatActivity{
 
 
                     if (brname) {
-                        individualData.put("name","Restaurant Name : " + new String(ch, start, length));
+                        individualData.put("name",new String(ch, start, length));
                         System.out.println("Restaurant Name : " + new String(ch, start, length));
                         brname = false;
                     }
 
                     if (baddress) {
-                        individualData.put("address", "Address : " + new String(ch, start, length));
+                        individualData.put("address", new String(ch, start, length));
                         System.out.println("Address : "
                                 + new String(ch, start, length));
                         baddress = false;
                     }
 
                     if (bopeningtimes) {
-                        individualData.put("openingtimes", "Opening Times: " + new String(ch, start, length));
+                        individualData.put("openingtimes",new String(ch, start, length));
                         System.out.println("Opening Times : "
                                 + new String(ch, start, length));
                         bopeningtimes = false;
                     }
 
                     if (bmealprice) {
-                        individualData.put("mealprice", "Meal Price: " + new String(ch, start, length));
+                        individualData.put("mealprice",new String(ch, start, length));
                         System.out.println("Meal Price : "
                                 + new String(ch, start, length));
                         bmealprice = false;
                     }
 
                     if (bweb) {
-                        individualData.put("website", "Website: " + new String(ch, start,length));
+                        individualData.put("website",new String(ch, start,length));
                         bweb = false;
                     }
                     if (burl){
-                        //TODO: parse the result into array of image URL strings
-                        if (individualData.get("imageurl") == null){//If it is empty, add in the imageurl directly
+                        //Add all imageURLs into one String, separated by spaces.
+                        if (individualData.get("imageurl") == null){//If it is empty, add in the imageurl String directly
                             individualData.put("imageurl", new String(ch, start, length));
                         } else {
                             //if there is something, append the new imageurl behind the current imageurl separated by space
@@ -322,6 +361,17 @@ public class LocateNearbyActivity extends AppCompatActivity{
                             individualData.put("imageurl", temp);
                         }
                         burl = false;
+                    }
+                    if (bdescription){
+                        individualData.put("description",new String(ch, start, length));
+                        bdescription = false;
+                    }
+                    if (bstars){
+                        String temp = new String(ch, start, length);
+                        Integer counter = Integer.valueOf(temp);
+                        String result = new String(new char[counter]).replace("\0", "★");
+                        individualData.put("stars",result);
+                        bstars = false;
                     }
 
                 }
