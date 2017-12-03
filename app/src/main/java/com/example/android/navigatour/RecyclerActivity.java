@@ -204,3 +204,4 @@ public class RecyclerActivity extends AppCompatActivity {
         }
     }
 }
+//1.2642822,103.8199691
