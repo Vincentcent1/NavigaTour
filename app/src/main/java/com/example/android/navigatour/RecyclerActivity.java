@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 public class RecyclerActivity extends AppCompatActivity {
 
-    ArrayList<AnimeJsonData> animeJsonData = new ArrayList<>();
+    ArrayList<RestaurantClass> restaurantClasses = new ArrayList<>();
 //    private ArrayList<>
     private RecyclerView recyclerView;
     private AnimeAdapter mAnimeAdapter;
@@ -33,15 +33,15 @@ public class RecyclerActivity extends AppCompatActivity {
 
         data = (ArrayList<HashMap<String,String>>) getIntent().getSerializableExtra("RESTAURANTS");
         int counter = 0;
-        AnimeJsonData tempData;
+        RestaurantClass tempData;
         ArrayList<String[]> imageUrl1Array = new ArrayList<>();
 
         //Adding data to animejsondata array
         while (counter < data.size()){
-            tempData = new AnimeJsonData(data.get(counter));
+            tempData = new RestaurantClass(data.get(counter));
             String[] imageUrl1 = tempData.getImageUrl();
             imageUrl1Array.add(imageUrl1);
-            animeJsonData.add(tempData);
+            restaurantClasses.add(tempData);
             counter++;
         }
         URL[][] urlss = new URL[data.size()][5];
@@ -64,42 +64,45 @@ public class RecyclerActivity extends AppCompatActivity {
         //          assign it to the recycler view object
         //TODO 4.11 create an instance of the Adapter and
         //          assign it to the recycler view object
-        mAnimeAdapter = new AnimeAdapter(this, animeJsonData);
+        mAnimeAdapter = new AnimeAdapter(this, restaurantClasses);
         recyclerView.setAdapter(mAnimeAdapter);
 
     }
 
-    public AnimeJsonData[] updateData(Bitmap[]...bitmaps){
+    public RestaurantClass[] updateData(Bitmap[]...bitmaps){
         int counter = 0;
-        AnimeJsonData[] animeJsonData1= new AnimeJsonData[animeJsonData.size()];
-        while (counter < animeJsonData.size()){
-            AnimeJsonData temp = animeJsonData.get(counter);
+        RestaurantClass[] restaurantClass1 = new RestaurantClass[restaurantClasses.size()];
+        while (counter < restaurantClasses.size()){
+            RestaurantClass temp = restaurantClasses.get(counter);
             temp.updateBitmap(bitmaps[counter]);
-            animeJsonData1[counter] = temp;
+            restaurantClass1[counter] = temp;
             counter++;
         }
-        return animeJsonData1;
+        return restaurantClass1;
 
     }
 
-    //TODO 3.1 Create an inner class matching the keys of the JSON array
-    public static class AnimeJsonData{
+    public static class RestaurantClass {
 
         String name;
         String address;
         String openingtimes;
         String mealprice;
         String website;
+        String description;
         String[] imageurl = new String[4];
+        String stars;
         Bitmap[] imageBitmap;
 
-        public AnimeJsonData(HashMap<String,String> data){
+        public RestaurantClass(HashMap<String,String> data){
             this.name = data.get("name");
             this.address = data.get("address");
             this.openingtimes = data.get("openingtimes");
             this.mealprice = data.get("mealprice");
+            this.description = data.get("description");
             this.website = data.get("website");
             this.imageurl = data.get("imageurl").split(" ");
+            this.stars = data.get("stars");
             this.imageBitmap = new Bitmap[imageurl.length];
         }
 
@@ -119,12 +122,21 @@ public class RecyclerActivity extends AppCompatActivity {
             return mealprice;
         }
 
+        public String getDescription(){
+            return description;
+        }
+
+
         public String getWebsite() {
             return website;
         }
         public String[] getImageUrl(){
             return this.imageurl;
         }
+        public String getStars() {
+            return this.stars;
+        }
+
         public String getImageurlAtIndex(int i){
             if (i >= imageurl.length){
                 Log.i("RecyclerClass", "Index out of bounds");
@@ -168,16 +180,12 @@ public class RecyclerActivity extends AppCompatActivity {
             URL[] tempurl;
             while (i < urls.length) {
                 tempurl = urls[i];
-                j = 0;
-                while (j < 4 && j < urls[i].length) {
-                    try {
-                        Log.i("URL",urls[i][j].toString());
-                        InputStream in = urls[i][j].openStream();
-                        foodPic[i][j] = BitmapFactory.decodeStream(in);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    j++;
+                try {
+                    Log.i("URL",tempurl[0].toString());
+                    InputStream in = tempurl[0].openStream();
+                    foodPic[i][0] = BitmapFactory.decodeStream(in);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 i++;
                 Log.i("I",String.valueOf(i) + " out of " + urls.length);
@@ -190,7 +198,7 @@ public class RecyclerActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap[][] foodPic){
             Log.i("POST","Post executing...");
             Toast.makeText(RecyclerActivity.this,"I'm at postexecute", Toast.LENGTH_SHORT).show();
-            AnimeJsonData[] data = updateData(foodPic);
+            RestaurantClass[] data = updateData(foodPic);
             mAnimeAdapter.update(data);
             mAnimeAdapter.notifyDataSetChanged();
         }

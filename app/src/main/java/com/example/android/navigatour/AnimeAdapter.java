@@ -20,13 +20,13 @@ import java.util.Arrays;
 
 public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHolder> {
 
-//    private RecyclerActivity.AnimeJsonData[] data;
-    private ArrayList<RecyclerActivity.AnimeJsonData> data;
+//    private RecyclerActivity.RestaurantClass[] data;
+    private ArrayList<RecyclerActivity.RestaurantClass> data;
     private static int viewHolderCount = 0;
     Context parentContext;
 
     //TODO 4.4 - Constructor
-    AnimeAdapter(Context context, ArrayList<RecyclerActivity.AnimeJsonData> data){
+    AnimeAdapter(Context context, ArrayList<RecyclerActivity.RestaurantClass> data){
         this.parentContext = context;
         this.data = data;
     }
@@ -61,8 +61,8 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
         return data.size();
     }
 
-    public void update(RecyclerActivity.AnimeJsonData[] data){
-        ArrayList<RecyclerActivity.AnimeJsonData> data2 = new ArrayList<>(Arrays.asList(data));
+    public void update(RecyclerActivity.RestaurantClass[] data){
+        ArrayList<RecyclerActivity.RestaurantClass> data2 = new ArrayList<>(Arrays.asList(data));
         this.data = data2;
     }
 
@@ -111,16 +111,18 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
-            RecyclerActivity.AnimeJsonData animeJsonData = data.get(clickedPosition);
+            RecyclerActivity.RestaurantClass restaurantClass = data.get(clickedPosition);
             ArrayList<String> arrayList = new ArrayList<>();
-            arrayList.add(animeJsonData.getName());
-            arrayList.add(animeJsonData.getAddress());
-            arrayList.add(animeJsonData.getMealprice());
-            arrayList.add(animeJsonData.getOpeningtimes());
-            arrayList.add(animeJsonData.getWebsite());
+            arrayList.add(restaurantClass.getName());
+            arrayList.add(restaurantClass.getDescription());
+            arrayList.add(restaurantClass.getAddress());
+            arrayList.add(restaurantClass.getOpeningtimes());
+            arrayList.add(restaurantClass.getMealprice());
+            arrayList.add(restaurantClass.getWebsite());
+            arrayList.add(restaurantClass.getStars());
             Toast.makeText(parentContext,String.valueOf(clickedPosition),Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(parentContext,RestaurantInfo.class);
-            intent.putExtra("IMAGEURL", animeJsonData.getImageUrl());
+            intent.putExtra("IMAGEURL", restaurantClass.getImageUrl());
             intent.putExtra("RESTAURANT", arrayList);
             parentContext.startActivity(intent);
         }

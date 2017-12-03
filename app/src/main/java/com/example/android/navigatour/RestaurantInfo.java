@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class RestaurantInfo extends AppCompatActivity {
 
-    TextView textView;
+    TextView textViewRestaurantName, textViewAddress, textViewWebsite, textViewOrderTime, textViewAveragePrice, textViewDescription;
     ImageView imageView1, imageView2, imageView3;
 
     @Override
@@ -25,20 +25,34 @@ public class RestaurantInfo extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_info);
         ArrayList<String> animeJsonData = (ArrayList<String>) getIntent().getSerializableExtra("RESTAURANT");
         String[] imageUrlStrings= (String[]) getIntent().getSerializableExtra("IMAGEURL");
+//        getSupportActionBar().setTitle(restaurantClasses.get(0));
+        textViewRestaurantName = findViewById(R.id.name);
+        textViewAddress = findViewById(R.id.address);
+        textViewAveragePrice = findViewById(R.id.averagePrice);
+        textViewOrderTime = findViewById(R.id.orderTime);
+        textViewWebsite = findViewById(R.id.website);
+        textViewDescription = findViewById(R.id.description);
 
-        textView = findViewById(R.id.text_view_information);
-        imageView1 = findViewById(R.id.image_view_food1);
-        imageView2 = findViewById(R.id.image_view_food2);
-        imageView3 = findViewById(R.id.image_view_food3);
+        imageView1 = findViewById(R.id.bigpic);
+        imageView2 = findViewById(R.id.smallpic1);
+        imageView3 = findViewById(R.id.smallpic2);
 
         URL[] imageUrls = RecyclerActivity.convertStringToUrl(imageUrlStrings);
 
         GetImageTaskSpecific getImageTaskSpecific = new GetImageTaskSpecific();
         getImageTaskSpecific.execute(imageUrls);
 
-        String information = animeJsonData.get(0) + "\n" + animeJsonData.get(1) + "\n" +
-                animeJsonData.get(2) + "\n" + animeJsonData.get(3) + "\n" + animeJsonData.get(4);
-        textView.setText(information);
+//        String information = restaurantClasses.get(0) + "\n" + restaurantClasses.get(1) + "\n" +
+//                restaurantClasses.get(2) + "\n" + restaurantClasses.get(3) + "\n" + restaurantClasses.get(4);
+        textViewRestaurantName.setText(animeJsonData.get(0) + animeJsonData.get(6));
+        textViewDescription.setText(animeJsonData.get(1));
+        textViewAddress.setText(animeJsonData.get(2));
+        textViewOrderTime.setText(animeJsonData.get(3));
+        textViewAveragePrice.setText(animeJsonData.get(4));
+        textViewWebsite.setText(animeJsonData.get(5));
+
+
+
 
     }
 
