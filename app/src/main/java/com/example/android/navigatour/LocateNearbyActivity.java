@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +77,9 @@ public class LocateNearbyActivity extends AppCompatActivity implements SharedPre
     Button locate;
     TextView numRes;
     TextView radius;
+    RadioButton d1;
+    RadioButton d2;
+    RadioButton d3;
     SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,9 @@ public class LocateNearbyActivity extends AppCompatActivity implements SharedPre
         startLocationUpdates();
 
 //        getCurrentLocation();
+        d1 = findViewById(R.id.distance1);
+        d2 = findViewById(R.id.distance2);
+        d3 = findViewById(R.id.distance3);
         locate = (Button)findViewById(R.id.locateButton);
         radius = (TextView)findViewById(R.id.radius);
         numRes = (TextView)findViewById(R.id.restaurantsTextView);
@@ -123,13 +130,18 @@ public class LocateNearbyActivity extends AppCompatActivity implements SharedPre
 
         if (ifChinese){
             locate.setText("定位");
-            numRes.setText("米其林餐厅数量");
-            radius.setText("范围");
+            numRes.setText("米其林餐厅数量:");
+            radius.setText("范围:");
+            d1.setText("附近");
+            d2.setText("五公里内");
+            d3.setText("全新加坡");
         }else{
-            locate.setText("LOCATE");
+            locate.setText("Locate");
             numRes.setText("Number of restaurants:");
-            radius.setText("Please indicate the radius you prefer");
-
+            radius.setText("Search radius:");
+            d1.setText("Nearby");
+            d2.setText("Within 5km");
+            d3.setText("Singapore");
         }
     }
     private void changeTheme (boolean ifTheme){
