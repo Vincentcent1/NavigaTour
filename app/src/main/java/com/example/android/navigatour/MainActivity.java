@@ -81,8 +81,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (ifChinese){
             part3.setText("开启新加坡名胜之旅！");
+
         }else{
             part3.setText(R.string.function3);
+
         }
     }
     @Override

@@ -3,11 +3,13 @@ package com.example.android.navigatour;
 import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,8 +18,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -58,7 +63,7 @@ import javax.xml.parsers.SAXParserFactory;
  * Created by setia on 11/15/2017.
  */
 //To connect to emulator and do geofixing: telnet localhost <console-port>
-public class LocateNearbyActivity extends AppCompatActivity {
+public class LocateNearbyActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     ArrayList<HashMap<String, String>> allData = new ArrayList<>();
     private Location userLocation;
     private final int LOCATION_PERMISSION_REQUEST = 1;
@@ -68,7 +73,10 @@ public class LocateNearbyActivity extends AppCompatActivity {
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest mLocationRequest = new LocationRequest();
     private LocationCallback mLocationCallback;
-
+    Button locate;
+    TextView numRes;
+    TextView radius;
+    SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +93,73 @@ public class LocateNearbyActivity extends AppCompatActivity {
         startLocationUpdates();
 
 //        getCurrentLocation();
+        locate = (Button)findViewById(R.id.locateButton);
+        radius = (TextView)findViewById(R.id.radius);
+        numRes = (TextView)findViewById(R.id.restaurantsTextView);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+        String chkBoxLargeFontKey = getString(R.string.checkBoxKey);
+        boolean isButtonLargeFont = sharedPref.getBoolean(chkBoxLargeFontKey,false);
+        changeFont(isButtonLargeFont);
+        String royalTheme = getString(R.string.checkBoxYellow);
+        boolean isRoyalTheme = sharedPref.getBoolean(royalTheme,false);
+        changeTheme(isRoyalTheme);
+        String Chinese = getString(R.string.checkBoxChinese);
+        boolean isChinese = sharedPref.getBoolean(Chinese,false);
+        changeLanguage(isChinese);
     }
+    public void changeFont(boolean iblf){
+        if (iblf){
+            locate.setTextSize(30);
+            radius.setTextSize(20);
+            numRes.setTextSize(20);
+        }else{
+            locate.setTextSize(20);
+            radius.setTextSize(15);
+            numRes.setTextSize(15);
+        }
+    }
+    public void changeLanguage(boolean ifChinese){
+
+        if (ifChinese){
+            locate.setText("定位");
+            numRes.setText("米其林餐厅数量");
+            radius.setText("范围");
+        }else{
+            locate.setText("LOCATE");
+            numRes.setText("Number of restaurants:");
+            radius.setText("Please indicate the radius you prefer");
+
+        }
+    }
+    private void changeTheme (boolean ifTheme){
+        LinearLayout locatelayout = (LinearLayout) findViewById(R.id.locateNearby);
+        if (ifTheme){
+            //myTheme = R.style.YellowTheme;
+            locatelayout.setBackgroundResource(R.color.whiteYellow);
+
+        }else{
+            //myTheme = R.style.AppRedTheme;
+            locatelayout.setBackgroundResource(R.color.whiteRed);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals("checkBoxYellow")){
+            boolean checked = sharedPreferences.getBoolean(s,false);
+            changeTheme(checked);
+        }
+        if (s.equals("checkBoxKey")){
+            boolean checked = sharedPreferences.getBoolean(s,false);
+            changeFont(checked);
+        }
+        if (s.equals("checkBoxChinese")){
+            boolean checked = sharedPreferences.getBoolean(s,false);
+            changeLanguage(checked);
+        }
+    }
+
 
     @Override
     protected void onResume() {
