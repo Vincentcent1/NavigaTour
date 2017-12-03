@@ -12,8 +12,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
+<<<<<<< HEAD
         android:text="Number of restaurants:"
         />
+=======
+        android:text="Number of restaurants:"/>
+>>>>>>> a80ecf95d14881ea800ded75a9014cd66d2cabcf
     <EditText
 
         android:id="@+id/numberOfRes"
@@ -35,7 +39,12 @@
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+<<<<<<< HEAD
+=======
+
+>>>>>>> a80ecf95d14881ea800ded75a9014cd66d2cabcf
         <RadioGroup
+            android:id="@+id/distance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
