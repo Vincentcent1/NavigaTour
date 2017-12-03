@@ -30,15 +30,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-<<<<<<< Updated upstream
 public class TSPActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
-=======
-public class TSPActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
->>>>>>> Stashed changes
     HashMap<String,ArrayList<HashMap<String,String>>> activitiesG;
     int minTime;
     double budgetRemaining;
-    SharedPreferences sharedPref;
     // Final results are stored in these arrays
     ArrayList<String> bestPath = new ArrayList<>();
     ArrayList<Double> bestCost = new ArrayList<>();
@@ -83,12 +78,16 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
 
         attractionsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         attractionsList.setAdapter(adapter);
-<<<<<<< Updated upstream
+
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
         String royalTheme = getString(R.string.checkBoxYellow);
         boolean isRoyalTheme = sharedPref.getBoolean(royalTheme,false);
+        String Chinese = getString(R.string.checkBoxChinese);
+        boolean isChinese = sharedPref.getBoolean(Chinese,false);
+        changeLanguage(isChinese);
         changeTheme(isRoyalTheme);
+
     }
     private void changeTheme (boolean ifTheme){
         LinearLayout tsplayout = (LinearLayout) findViewById(R.id.tsplayout);
@@ -100,20 +99,6 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
             //myTheme = R.style.AppRedTheme;
             tsplayout.setBackgroundResource(R.color.whiteRed);
         }
-    }
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if (s.equals("checkBoxYellow")){
-            boolean checked = sharedPreferences.getBoolean(s,false);
-            changeTheme(checked);
-        }
-=======
-
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            sharedPref.registerOnSharedPreferenceChangeListener(this);
-        String Chinese = getString(R.string.checkBoxChinese);
-        boolean isChinese = sharedPref.getBoolean(Chinese,false);
-        changeLanguage(isChinese);
     }
 
     public void changeLanguage(boolean ifChinese){
@@ -136,7 +121,6 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
             findButton.setText(R.string.findStr);
         }
         adapter.notifyDataSetChanged();
->>>>>>> Stashed changes
     }
 
 
@@ -535,7 +519,11 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if (s.equals(getString(R.string.checkBoxChinese))){
+        if (s.equals("checkBoxYellow")){
+            boolean checked = sharedPreferences.getBoolean(s,false);
+            changeTheme(checked);
+        }
+        else if (s.equals(getString(R.string.checkBoxChinese))){
             changeLanguage(sharedPreferences.getBoolean(s,false));
         }
     }
