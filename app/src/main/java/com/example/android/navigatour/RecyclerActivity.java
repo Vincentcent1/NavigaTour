@@ -21,7 +21,7 @@ public class RecyclerActivity extends AppCompatActivity {
     ArrayList<RestaurantClass> restaurantClasses = new ArrayList<>();
 //    private ArrayList<>
     private RecyclerView recyclerView;
-    private AnimeAdapter mAnimeAdapter;
+    private RestaurantAdapter mRestaurantAdapter;
     private ArrayList<HashMap<String,String>> data;
 
 
@@ -35,7 +35,7 @@ public class RecyclerActivity extends AppCompatActivity {
         RestaurantClass tempData;
         ArrayList<String[]> imageUrl1Array = new ArrayList<>();
 
-        //Adding data to animejsondata array
+        //Adding data to restaurant array
         while (counter < data.size()){
             tempData = new RestaurantClass(data.get(counter));
             String[] imageUrl1 = tempData.getImageUrl();
@@ -63,8 +63,8 @@ public class RecyclerActivity extends AppCompatActivity {
         //          assign it to the recycler view object
         //TODO 4.11 create an instance of the Adapter and
         //          assign it to the recycler view object
-        mAnimeAdapter = new AnimeAdapter(this, restaurantClasses);
-        recyclerView.setAdapter(mAnimeAdapter);
+        mRestaurantAdapter = new RestaurantAdapter(this, restaurantClasses);
+        recyclerView.setAdapter(mRestaurantAdapter);
 
     }
 
@@ -198,8 +198,8 @@ public class RecyclerActivity extends AppCompatActivity {
             Log.i("POST","Post executing...");
 //            Toast.makeText(RecyclerActivity.this,"I'm at postexecute", Toast.LENGTH_SHORT).show();
             RestaurantClass[] data = updateData(foodPic);
-            mAnimeAdapter.update(data);
-            mAnimeAdapter.notifyDataSetChanged();
+            mRestaurantAdapter.update(data);
+            mRestaurantAdapter.notifyDataSetChanged();
         }
     }
 }

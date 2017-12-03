@@ -1,11 +1,14 @@
 package com.example.android.navigatour;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,12 +21,13 @@ public class RestaurantInfo extends AppCompatActivity {
 
     TextView textViewRestaurantName, textViewAddress, textViewWebsite, textViewOrderTime, textViewAveragePrice, textViewDescription;
     ImageView imageView1, imageView2, imageView3;
+    ArrayList<String> restaurantArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_info);
-        ArrayList<String> animeJsonData = (ArrayList<String>) getIntent().getSerializableExtra("RESTAURANT");
+        restaurantArray = (ArrayList<String>) getIntent().getSerializableExtra("RESTAURANT");
         String[] imageUrlStrings= (String[]) getIntent().getSerializableExtra("IMAGEURL");
 //        getSupportActionBar().setTitle(restaurantClasses.get(0));
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -45,15 +49,24 @@ public class RestaurantInfo extends AppCompatActivity {
 
 //        String information = restaurantClasses.get(0) + "\n" + restaurantClasses.get(1) + "\n" +
 //                restaurantClasses.get(2) + "\n" + restaurantClasses.get(3) + "\n" + restaurantClasses.get(4);
-        textViewRestaurantName.setText(animeJsonData.get(0) + animeJsonData.get(6));
-        textViewDescription.setText(animeJsonData.get(1));
-        textViewAddress.setText(animeJsonData.get(2));
-        textViewOrderTime.setText(animeJsonData.get(3));
-        textViewAveragePrice.setText(animeJsonData.get(4));
-        textViewWebsite.setText(animeJsonData.get(5));
+        textViewRestaurantName.setText(restaurantArray.get(0) + restaurantArray.get(6));
+        textViewDescription.setText(restaurantArray.get(1));
+        textViewAddress.setText(restaurantArray.get(2));
+        textViewOrderTime.setText(restaurantArray.get(3));
+        textViewAveragePrice.setText(restaurantArray.get(4));
+        textViewWebsite.setText(restaurantArray.get(5));
 
 
 
+
+    }
+
+    public void DisplayMap(View view) {
+        String address = restaurantArray.get(2);
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + address );
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
 
     }
 

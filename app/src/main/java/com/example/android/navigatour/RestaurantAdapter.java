@@ -17,7 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHolder> {
+public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder> {
 
 //    private RecyclerActivity.RestaurantClass[] data;
     private ArrayList<RecyclerActivity.RestaurantClass> data;
@@ -25,7 +25,7 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
     Context parentContext;
 
     //TODO 4.4 - Constructor
-    AnimeAdapter(Context context, ArrayList<RecyclerActivity.RestaurantClass> data){
+    RestaurantAdapter(Context context, ArrayList<RecyclerActivity.RestaurantClass> data){
         this.parentContext = context;
         this.data = data;
     }
@@ -34,7 +34,7 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
     //TODO 4.8 - getItemCount
 
     @Override
-    public AnimeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RestaurantViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //Inflates the viewholder layout, instantiate the VH class
         int layoutIDForListItem = R.layout.cards_layout;
         LayoutInflater inflater = LayoutInflater.from(parentContext);
@@ -42,13 +42,13 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
 
         View view = inflater.inflate(layoutIDForListItem,parent,shouldAttachToParentImmediately);
 
-        AnimeViewHolder animeViewHolder = new AnimeViewHolder(view);
+        RestaurantViewHolder restaurantViewHolder = new RestaurantViewHolder(view);
 
-        return animeViewHolder;
+        return restaurantViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(AnimeViewHolder holder, int position) {
+    public void onBindViewHolder(RestaurantViewHolder holder, int position) {
         //Attach data to the widget
         holder.bind(position);
         //Download image from url
@@ -66,13 +66,13 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
     }
 
 
-    class AnimeViewHolder extends RecyclerView.ViewHolder
+    class RestaurantViewHolder extends RecyclerView.ViewHolder
         implements View.OnClickListener {
         ImageView foodImageView;
         TextView restaurantTextView;
         View v;
 
-        AnimeViewHolder(View v){
+        RestaurantViewHolder(View v){
             super(v);
             this.v = v;
             //TODO 4.3 Invoke the superclass constructor
