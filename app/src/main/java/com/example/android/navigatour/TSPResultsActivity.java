@@ -2,15 +2,18 @@ package com.example.android.navigatour;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,19 +38,25 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCallback {
-
+public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCallback,SharedPreferences.OnSharedPreferenceChangeListener {
+    SharedPreferences sharedPref;
     private GoogleMap mMap;
     String[] bestPath;
     int[] bestTime;
     double[] bestCost;
     String[] names;
+    String[] chineseNames;
+    String[] markerTitles;
+    String[] chineseMarkerTitles;
     ArrayList<LatLng> locations;
     ArrayList<String> transport;
 
+    String intructionsStr;
+    String chineseInstructionsStr;
+
     // This is the Adapter being used to display the list's data
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private MyAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     GMapV2Direction md = new GMapV2Direction();
@@ -73,6 +82,7 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
         bestCost = getIntent().getDoubleArrayExtra("cost");
         bestTime = getIntent().getIntArrayExtra("time");
         names = getIntent().getStringArrayExtra("names");
+        chineseNames = getIntent().getStringArrayExtra("chineseNames");
         locations = new ArrayList<>();
         transport = new ArrayList<>();
 
@@ -106,6 +116,7 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
         mMap = googleMap;
 
         ArrayList<String> markerNamesList = new ArrayList<>(); // For map markers
+        ArrayList<String> chineseNamesList = new ArrayList<>(); // For map markers
         ArrayList<String> listNamesList = new ArrayList<>(); // For RecyclerView
 
         // Display markers for each attraction
@@ -130,33 +141,42 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
 
             // Format string accordingly and add to array for the RecyclerView
             String transportTitle = ".";
+            String chineseTransportTitle = ".";
             if(i > 0) {
                 transportTitle = transport.get(i-1);
+                chineseTransportTitle = transport.get(i-1);
 
                 // Format string intuitively
                 if(transportTitle.equals("public")) {
                     transportTitle = "Take public transport to ";
+                    chineseTransportTitle = "搭公车到";
                 }
                 else if(transportTitle.equals("taxi")) {
                     transportTitle = "Take a taxi to ";
+                    chineseTransportTitle = "搭德士到";
                 }
                 else {
                     // Foot
                     transportTitle = "Walk to ";
+                    chineseTransportTitle = "走到";
                 }
 
                 transportTitle += names[i] + ". Cost: $" + String.valueOf(bestCost[i-1]) + ". Time taken: " + String.valueOf(bestTime[i-1]) + " mins";
+                chineseTransportTitle += chineseNames[i] + ". 价格: $" + String.valueOf(bestCost[i-1]) + ". 所需时间: " + String.valueOf(bestTime[i-1]) + " 分钟";
             }
             else {
                 transportTitle = names[i];
+                chineseTransportTitle = chineseNames[i];
             }
 
             // Add to appropriate arrays
             String markerTitle = String.valueOf(i+1) + numberSuffix + " stop: " + names[i];
             String listTitle = String.valueOf(i+1) + numberSuffix + " stop: " + transportTitle;
+            String chineseListTitle = String.valueOf(i+1) + ". " + chineseTransportTitle;
 
             markerNamesList.add(markerTitle);
             listNamesList.add(listTitle);
+            chineseNamesList.add(chineseListTitle);
 
             //markerNamesList.add(transportTitle);
             Marker marker = mMap.addMarker(new MarkerOptions().position(attraction).title(markerTitle));
@@ -169,12 +189,43 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
             }
         }
 
+        markerTitles = listNamesList.toArray(new String[listNamesList.size()]);
+        chineseMarkerTitles = chineseNamesList.toArray(new String[chineseNamesList.size()]);
+
         // Set as RecyclerView adapter
-        mAdapter = new MyAdapter(listNamesList.toArray(new String[listNamesList.size()]));
+        mAdapter = new MyAdapter(markerTitles);
         mRecyclerView.setAdapter(mAdapter);
 
         // Draw paths between each location
         drawPath();
+
+        // Preferences
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+
+        String Chinese = getString(R.string.checkBoxChinese);
+        boolean isChinese = sharedPref.getBoolean(Chinese,false);
+        if(isChinese) {
+            changeLanguage(isChinese);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals(getString(R.string.checkBoxChinese))){
+            boolean isChinese = sharedPreferences.getBoolean(s,false);
+            Log.i("Chinese", String.valueOf(isChinese));
+            changeLanguage(isChinese);
+        }
+    }
+
+    public void changeLanguage(boolean ifChinese){
+        if(ifChinese) {
+            mAdapter.setDataset(chineseMarkerTitles);
+        }
+        else {
+            mAdapter.setDataset(markerTitles);
+        }
     }
 
     private class showRoute extends AsyncTask<Void, Void, Document> {
@@ -253,6 +304,10 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
                 super(v);
                 mTextView = v;
             }
+        }
+
+        public void setDataset(String[] newDataset) {
+            mDataset = newDataset;
         }
 
         // Provide a suitable constructor (depends on the kind of dataset)

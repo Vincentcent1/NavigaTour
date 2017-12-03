@@ -19,21 +19,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/budgetText"
-        android:hint="What is your budget?"
+        android:hint="@+string/budgetText"
         />
 
     <CheckBox
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/wantOptimal"
-        android:text="I want the optimal solution!" />
+        android:text="@+string/wantOptimal" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/findButton"
         android:onClick="findRoute"
-        android:text="Find"/>
+        android:text="@+string/findStr"/>
 
 
 </LinearLayout>

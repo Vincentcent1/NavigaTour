@@ -1,8 +1,8 @@
 {
-	"flyer": {"name": "Singapore Flyer", "latLng": "1.289524, 103.863223"},
-	"vivo": {"name": "Vivo City", "latLng": "1.264625, 103.822169" },
-	"rws": {"name": "Resorts World Sentosa", "latLng": "1.255490, 103.821843" },
-	"mbs": {"name": "Marina Bay Sands", "latLng": "1.284235, 103.860886" },
-	"temple": {"name": "Buddha Tooth Relic Temple", "latLng": "1.281603, 103.844334"},
-	"zoo": {"name": "The Singapore Zoooooo", "latLng": "1.404446, 103.793050" }
+	"flyer": {"name": "Singapore Flyer", "chinese": "新加坡摩天观景轮", "latLng": "1.289524, 103.863223"},
+	"vivo": {"name": "Vivo City", "chinese": "怡丰城", "latLng": "1.264625, 103.822169" },
+	"rws": {"name": "Resorts World Sentosa", "chinese": "圣淘沙名胜世界", "latLng": "1.255490, 103.821843" },
+	"mbs": {"name": "Marina Bay Sands", "chinese": "金沙酒店", "latLng": "1.284235, 103.860886" },
+	"temple": {"name": "Buddha Tooth Relic Temple", "chinese": "佛牙寺", "latLng": "1.281603, 103.844334"},
+	"zoo": {"name": "The Singapore Zoooooo", "chinese": "新加坡动物园", "latLng": "1.404446, 103.793050" }
 }

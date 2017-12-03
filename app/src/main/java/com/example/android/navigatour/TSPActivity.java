@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -29,7 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+<<<<<<< Updated upstream
 public class TSPActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
+=======
+public class TSPActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+>>>>>>> Stashed changes
     HashMap<String,ArrayList<HashMap<String,String>>> activitiesG;
     int minTime;
     double budgetRemaining;
@@ -40,13 +45,12 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
     ArrayList<Integer> bestTime = new ArrayList<>();
     ArrayList<String> attractions;
     ArrayList<String> attractionNames;
+    ArrayList<String> chineseAttractionNames;
     ListView attractionsList;
     ArrayAdapter<String> adapter;
     HashMap<String, HashMap<String, String>> attractionDataHash;
 
-    // Maximum attractions we perform brute force on is 5, as this produces a reasonably large time complexity
-    static final int BRUTE_THRESHOLD = 5;
-
+    SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,22 +65,25 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
 
         attractions = new ArrayList<>();
         attractionNames = new ArrayList<>();
+        chineseAttractionNames = new ArrayList<>();
 
         // Process attraction data from other JSON files
         for(String key : attractionDataHash.keySet()) {
             if(!key.equals("mbs")) {
                 attractions.add(key);
                 attractionNames.add(attractionDataHash.get(key).get("name"));
+                chineseAttractionNames.add(attractionDataHash.get(key).get("chinese"));
             }
         }
 
         attractionsList = (ListView)findViewById(R.id.attractionsList);
 
-        // Set checklist to use the attraction names
         adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, attractionNames);
+                android.R.layout.simple_list_item_multiple_choice, new ArrayList<String>());
+
         attractionsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         attractionsList.setAdapter(adapter);
+<<<<<<< Updated upstream
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
         String royalTheme = getString(R.string.checkBoxYellow);
@@ -100,6 +107,36 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
             boolean checked = sharedPreferences.getBoolean(s,false);
             changeTheme(checked);
         }
+=======
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            sharedPref.registerOnSharedPreferenceChangeListener(this);
+        String Chinese = getString(R.string.checkBoxChinese);
+        boolean isChinese = sharedPref.getBoolean(Chinese,false);
+        changeLanguage(isChinese);
+    }
+
+    public void changeLanguage(boolean ifChinese){
+        // Update ArrayAdapter
+        adapter.clear();
+        EditText budgetText = findViewById(R.id.budgetText);
+        CheckBox wantOptimal = findViewById(R.id.wantOptimal);
+        Button findButton = findViewById(R.id.findButton);
+
+        if(ifChinese) {
+            adapter.addAll(chineseAttractionNames);
+            budgetText.setHint(R.string.budgetTextChinese);
+            wantOptimal.setText(R.string.wantOptimalChinese);
+            findButton.setText(R.string.findStrChinese);
+        }
+        else {
+            adapter.addAll(attractionNames);
+            budgetText.setHint(R.string.budgetText);
+            wantOptimal.setText(R.string.wantOptimal);
+            findButton.setText(R.string.findStr);
+        }
+        adapter.notifyDataSetChanged();
+>>>>>>> Stashed changes
     }
 
 
@@ -167,7 +204,8 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
             String[] bestPathArray = bestPath.toArray(new String[bestPath.size()]);
             Double[] bestCostArray = bestCost.toArray(new Double[bestCost.size()]);
             Integer[] bestTimeArray = bestTime.toArray(new Integer[bestTime.size()]);
-            String[] attractionNamesArray = new String[bestPathArray.length];
+            String[] attractionNamesArray = new String[bestPath.size()];
+            String[] attractionChineseNamesArray = new String[bestPath.size()];
 
             // Pass latLng values to map
             for(int i = 0; i < bestPathArray.length; i++) {
@@ -179,6 +217,7 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
                     if(i % 2 == 0) {
                         String attractionName = attraction.get("name");
                         attractionNamesArray[i/2] = attractionName;
+                        attractionChineseNamesArray[i/2] = attraction.get("chinese");
                     }
                 }
             }
@@ -196,6 +235,7 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
             intent.putExtra("time", bestPrimitiveTimeArray);
             intent.putExtra("cost", bestPrimitiveCostArray);
             intent.putExtra("names", attractionNamesArray);
+            intent.putExtra("chineseNames", attractionChineseNamesArray);
             startActivity(intent);
         }
         else {
@@ -491,5 +531,12 @@ public class TSPActivity extends AppCompatActivity implements SharedPreferences.
             return true;
         }
         return true;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals(getString(R.string.checkBoxChinese))){
+            changeLanguage(sharedPreferences.getBoolean(s,false));
+        }
     }
 }

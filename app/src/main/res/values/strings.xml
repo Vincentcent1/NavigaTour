@@ -19,4 +19,11 @@
     <string name="CBKtitle">Larger Font</string>
     <string name="CBKon">Large</string>
     <string name="CBKoff">Normal</string>
+
+    <string name="budgetText">What is your budget?</string>
+    <string name="budgetTextChinese">您的预算是多少？</string>
+    <string name="wantOptimal">I want the optimal solution!</string>
+    <string name="wantOptimalChinese">我要最理想的路线</string>
+    <string name="findStr">Find</string>
+    <string name="findStrChinese">寻找路线</string>
 </resources>

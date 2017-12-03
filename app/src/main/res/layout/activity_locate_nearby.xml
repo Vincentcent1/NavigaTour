@@ -13,8 +13,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
+<<<<<<< Updated upstream
         android:text="Number of restaurants:"
         android:layout_marginTop="8dp"
+=======
+        android:text="Please enter the number of restaurant that you want to show:"
+>>>>>>> Stashed changes
         />
     <EditText
 
