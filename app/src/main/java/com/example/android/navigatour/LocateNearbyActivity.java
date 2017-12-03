@@ -155,15 +155,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
 
 
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
             return;
         }
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
@@ -226,6 +218,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
 //
 //        }
 //        progressBar.setVisibility(View.GONE);
+        allData.clear();
         if (userLocation == null){
             getCurrentLocation();
         }
@@ -253,6 +246,10 @@ public class LocateNearbyActivity extends AppCompatActivity {
                 break;
             case R.id.distance3:
                 radius = 25000;
+                break;
+            default:
+                Toast.makeText(this, "Please choose the radius", Toast.LENGTH_LONG).show();
+                return;
         }
 
 
@@ -406,7 +403,6 @@ public class LocateNearbyActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        HashMap<String,String> restaurants = allData.get(0);
     }
 
     public class GetRestaurantsTask extends AsyncTask<URL, Void, InputSource> {
