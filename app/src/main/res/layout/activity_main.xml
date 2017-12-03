@@ -15,7 +15,7 @@
         android:layout_weight="2">
 
 
-        <ImageView
+        <ImageButton
             android:id="@+id/part1"
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -24,6 +24,8 @@
             android:layout_marginTop="65dp"
             android:onClick="startLocateNearby"
             android:scaleType="centerCrop"
+            android:elevation="3dp"
+            android:background="@color/crimsonRed"
             android:src="@drawable/michelinguide" />
 
         <Button

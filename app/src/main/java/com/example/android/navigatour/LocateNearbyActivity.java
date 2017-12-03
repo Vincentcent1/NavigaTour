@@ -136,6 +136,7 @@ public class LocateNearbyActivity extends AppCompatActivity implements SharedPre
         LinearLayout locatelayout = (LinearLayout) findViewById(R.id.locateNearby);
         if (ifTheme){
             //myTheme = R.style.YellowTheme;
+
             locatelayout.setBackgroundResource(R.color.whiteYellow);
 
         }else{

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
@@ -17,12 +18,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     SharedPreferences sharedPref;
     Button part3;
-    ImageView part1;
+    ImageButton part1;
     Integer myTheme = R.style.AppRedTheme;
     Bundle bundle;
     @Override
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setTheme(myTheme);
         setContentView(R.layout.activity_main);
         bundle = savedInstanceState;
-        part1 = (ImageView) findViewById(R.id.part1);
+        part1 = (ImageButton) findViewById(R.id.part1);
         part3 = (Button)findViewById(R.id.part2);
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
@@ -57,24 +59,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void changeTheme (boolean ifTheme){
         ConstraintLayout bgElement = (ConstraintLayout) findViewById(R.id.mylayout);
         if (ifTheme){
-            //myTheme = R.style.YellowTheme;
             bgElement.setBackgroundResource(R.color.whiteYellow);
             part1.setImageResource(R.drawable.royalmichellinstar);
             part1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            part1.setBackgroundResource(R.color.lightYellow);
-            part3.setBackgroundResource(R.color.lightYellow);
+            part1.setBackgroundResource(R.color.whiteYellow);
+            part3.setBackgroundResource(R.color.whiteYellow);
             part3.setTextColor(getResources().getColor(R.color.royalYellow));
-            //setContentView(R.layout.activity_main);
         }else{
-            //myTheme = R.style.AppRedTheme;
             bgElement.setBackgroundResource(R.color.crimsonRed);
             part1.setImageResource(R.drawable.michelinguide);
             part1.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            part1.setBackgroundResource(R.color.crimsonRed);
             part3.setBackgroundResource(R.color.darkRed);
             part3.setTextColor(getResources().getColor(R.color.whiteRed));
-            //setContentView(R.layout.activity_main);
-            //super.onRestart();
-            //super.onCreate(bundle);
         }
     }
     public void changeLanguage(boolean ifChinese){

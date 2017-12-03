@@ -17,6 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/michelinstar"
         android:supportsRtl="true"
+        android:screenOrientation="portrait"
         android:theme="@style/AppRedTheme">
         <activity android:name=".MainActivity"
             android:label="Michelin"
@@ -49,9 +50,11 @@
 
         <activity
             android:name=".TSPResultsActivity"
-            android:label="@string/title_activity_tspresults" />
+            android:label="@string/title_activity_tspresults"
+            />
         <activity android:name=".SettingsActivity"
-            android:theme="@style/AppRedTheme"
+            android:theme="@style/AppTheme"
+            android:label="Settings"
             />
         <activity android:name=".RecyclerActivity" />
         <activity android:name=".RestaurantInfo"></activity>
