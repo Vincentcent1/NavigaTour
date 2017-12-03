@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/budgetText"
         android:hint="@+string/budgetText"
+        android:inputType="number"
         />
 
     <CheckBox
