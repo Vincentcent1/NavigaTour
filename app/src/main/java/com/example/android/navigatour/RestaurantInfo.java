@@ -26,6 +26,7 @@ public class RestaurantInfo extends AppCompatActivity {
         ArrayList<String> animeJsonData = (ArrayList<String>) getIntent().getSerializableExtra("RESTAURANT");
         String[] imageUrlStrings= (String[]) getIntent().getSerializableExtra("IMAGEURL");
 //        getSupportActionBar().setTitle(restaurantClasses.get(0));
+        getSupportActionBar().setHomeButtonEnabled(true);
         textViewRestaurantName = findViewById(R.id.name);
         textViewAddress = findViewById(R.id.address);
         textViewAveragePrice = findViewById(R.id.averagePrice);

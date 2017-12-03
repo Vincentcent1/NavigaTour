@@ -56,8 +56,10 @@
             android:theme="@style/AppTheme"
             android:label="Settings"
             />
-        <activity android:name=".RecyclerActivity" />
-        <activity android:name=".RestaurantInfo"></activity>
+        <activity android:name=".RecyclerActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".RestaurantInfo"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>
