@@ -177,7 +177,7 @@ public class LocateNearbyActivity extends AppCompatActivity implements SharedPre
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
                     getCurrentLocation();
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
@@ -214,7 +214,7 @@ public class LocateNearbyActivity extends AppCompatActivity implements SharedPre
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null
                         if (location != null) {
-                            Toast.makeText(getApplicationContext(), "Location sent", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getApplicationContext(), "Location sent", Toast.LENGTH_SHORT).show();
                             userLocation = location;
                         } else {
 //                            Toast.makeText(getApplicationContext(), "User Location not found", Toast.LENGTH_SHORT).show();

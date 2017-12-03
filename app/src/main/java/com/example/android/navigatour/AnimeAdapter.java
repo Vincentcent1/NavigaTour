@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,7 +121,7 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
             arrayList.add(restaurantClass.getMealprice());
             arrayList.add(restaurantClass.getWebsite());
             arrayList.add(restaurantClass.getStars());
-            Toast.makeText(parentContext,String.valueOf(clickedPosition),Toast.LENGTH_SHORT).show();
+//            Toast.makeText(parentContext,String.valueOf(clickedPosition),Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(parentContext,RestaurantInfo.class);
             intent.putExtra("IMAGEURL", restaurantClass.getImageUrl());
             intent.putExtra("RESTAURANT", arrayList);

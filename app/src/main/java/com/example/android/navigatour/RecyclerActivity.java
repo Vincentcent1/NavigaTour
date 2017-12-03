@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -197,7 +196,7 @@ public class RecyclerActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Bitmap[][] foodPic){
             Log.i("POST","Post executing...");
-            Toast.makeText(RecyclerActivity.this,"I'm at postexecute", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(RecyclerActivity.this,"I'm at postexecute", Toast.LENGTH_SHORT).show();
             RestaurantClass[] data = updateData(foodPic);
             mAnimeAdapter.update(data);
             mAnimeAdapter.notifyDataSetChanged();
