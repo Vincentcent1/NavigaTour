@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -60,7 +62,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
     ArrayList<HashMap<String, String>> allData = new ArrayList<>();
     private Location userLocation;
     private final int LOCATION_PERMISSION_REQUEST = 1;
-    private boolean locationReady = false;
+    private boolean locationDefault = false;
     private LocationManager locationManager;
     private String provider;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -79,6 +81,9 @@ public class LocateNearbyActivity extends AppCompatActivity {
         };
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         createLocationRequest();
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+        startLocationUpdates();
+
 //        getCurrentLocation();
     }
 
@@ -99,21 +104,22 @@ public class LocateNearbyActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
                     getCurrentLocation();
-
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
 
                 } else {
-                    Toast.makeText(this, "Setting Changi Airport as default location", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Setting Changi Airport as default location", Toast.LENGTH_SHORT).show();
                     userLocation = new Location("");
                     userLocation.setLatitude(1.36);
                     userLocation.setLongitude(103.99);
-                    locationReady = true;
+                    locationDefault = true;
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
                 return;
             }
+            default:
+                return;
 
             // other 'case' lines to check for other
             // permissions this app might request
@@ -125,7 +131,6 @@ public class LocateNearbyActivity extends AppCompatActivity {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request permission if app doesn't have permission yet
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
             return;
         }
         mFusedLocationClient.getLastLocation()
@@ -136,13 +141,13 @@ public class LocateNearbyActivity extends AppCompatActivity {
                         if (location != null) {
                             Toast.makeText(getApplicationContext(), "Location sent", Toast.LENGTH_SHORT).show();
                             userLocation = location;
-                            locationReady = true;
                         } else {
-                            Toast.makeText(getApplicationContext(), "Location is null", Toast.LENGTH_SHORT).show();
-                            location = new Location("");
-                            location.setLongitude(103.85);
-                            location.setLatitude(1.29);
-                            locationReady = true;
+//                            Toast.makeText(getApplicationContext(), "User Location not found", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getApplicationContext(),"Setting Changi Airport as default location", Toast.LENGTH_SHORT).show();
+                            userLocation = new Location("");
+                            userLocation.setLongitude(103.9893421);
+                            userLocation.setLatitude(1.3644202);
+                            locationDefault = true;
                         }
                     }
                 });
@@ -158,6 +163,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
             return;
         }
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
@@ -178,13 +184,14 @@ public class LocateNearbyActivity extends AppCompatActivity {
         task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                getCurrentLocation();
+
             }
         });
         task.addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 int statuscode = ((ApiException) e).getStatusCode();
+                Toast.makeText(getApplicationContext(),"failure", Toast.LENGTH_SHORT);
                 switch (statuscode){
                     case CommonStatusCodes.RESOLUTION_REQUIRED:
                         // Location settings are not satisfied, but this can be fixed
@@ -214,7 +221,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
 //        getCurrentLocation();
 //        ProgressBar progressBar = findViewById(R.id.locate_nearby_progressbar);
 //        progressBar.setVisibility(View.VISIBLE);
-//        while(!locationReady){
+//        while(!locationDefault){
 //            //wait
 //
 //        }
@@ -226,11 +233,35 @@ public class LocateNearbyActivity extends AppCompatActivity {
         double latitude = userLocation.getLatitude();
         String longitudeS = String.valueOf(longitude);
         String latitudeS = String.valueOf(latitude);
+
+        EditText editTextNoOfRes = (EditText) findViewById(R.id.numberOfRes);
+        String numberOfRestaurants = editTextNoOfRes.getText().toString().trim();
+        if (!numberOfRestaurants.matches("\\d+")) {
+            Toast.makeText(this, "Number of Restaurants must be a positive integer", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        //Get radius value from radiogroup
+        int radius = 1000;
+        RadioGroup radioGroup = findViewById(R.id.distance);
+        switch (radioGroup.getCheckedRadioButtonId()){
+            case R.id.distance1:
+                radius = 1000;
+                break;
+            case R.id.distance2:
+                radius = 5000;
+                break;
+            case R.id.distance3:
+                radius = 25000;
+        }
+
+
+
         URL requestURL = null;
         try {
             //center: <longitude>:<Latitude>
             //Singapore: <103.85:1.29>
-            requestURL = new URL("http://apir.viamichelin.com/apir/2/findPoi.xml/RESTAURANT/eng?center=" + longitudeS + ":"+ latitudeS + "&nb=10&dist=1000&source=RESGR&filter=AGG.provider%20eq%20RESGR&charset=UTF-8&ie=UTF-8&authKey=RESTGP20171120074056040173531595");
+            requestURL = new URL("http://apir.viamichelin.com/apir/2/findPoi.xml/RESTAURANT/eng?center=" + longitudeS + ":"+ latitudeS + "&nb=" + numberOfRestaurants + "&dist=" + radius + "&source=RESGR&filter=AGG.provider%20eq%20RESGR&charset=UTF-8&ie=UTF-8&authKey=RESTGP20171120074056040173531595");
             Log.i("URL", requestURL.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -366,87 +397,16 @@ public class LocateNearbyActivity extends AppCompatActivity {
                 public void characters(char ch[], int start, int length)
                         throws SAXException {
 
-//                    System.out.println(s);
                     stringBuffer.append(ch, start, length);
-
-//                    if (!s.equals("")) {
-//                        if (brname) {
-//                            individualData.put("name", s);
-//                            System.out.println("Restaurant Name : " + s);
-//                            brname = false;
-//                        }
-//
-//                        if (baddress) {
-//                            individualData.put("address", s);
-//                            System.out.println("Address : "
-//                                    + s);
-//                            baddress = false;
-//                        }
-//
-//                        if (bopeningtimes) {
-//                            individualData.put("openingtimes", s);
-//                            System.out.println("Opening Times : "
-//                                    + s);
-//                            bopeningtimes = false;
-//                        }
-//
-//                        if (bmealprice) {
-//                            individualData.put("mealprice", s);
-//                            System.out.println("Meal Price : "
-//                                    + s);
-//                            bmealprice = false;
-//                        }
-//
-//                        if (bweb) {
-//                            individualData.put("website", new String(ch, start, length));
-//                            bweb = false;
-//                        }
-//                        if (burl) {
-//                            //Add all imageURLs into one String, separated by spaces.
-//                            if (individualData.get("imageurl") == null) {//If it is empty, add in the imageurl String directly
-//                                individualData.put("imageurl", s);
-//                            } else {
-//                                //if there is something, append the new imageurl behind the current imageurl separated by space
-//                                String temp = individualData.get("imageurl");
-//                                temp += " " + s;
-//                                individualData.put("imageurl", temp);
-//                            }
-//                            burl = false;
-//                        }
-//                        if (bdescription) {
-//
-//                            individualData.put("description", s);
-//                            bdescription = false;
-//                        }
-//                        if (bstars) {
-//                            String temp = s;
-//                            Integer counter = Integer.valueOf(temp);
-//                            String result = new String(new char[counter]).replace("\0", "★");
-//                            individualData.put("stars", result);
-//                            bstars = false;
-//                        }
-//                    }
                 }
 
             };
 
-//            InputStream inputStream= new FileInputStream(file);
-//            Reader reader = new InputStreamReader(inputStream,"UTF-8");
             saxParser.parse(is, handler);
         } catch (Exception e) {
             e.printStackTrace();
         }
         HashMap<String,String> restaurants = allData.get(0);
-//        Iterator iterator= restaurants.keySet().iterator();
-//        String textDisplayed = "";
-//        while (iterator.hasNext()){
-//            textDisplayed += restaurants.get(iterator.next());
-//            if (iterator.hasNext()){
-//                textDisplayed += "\n";
-//            }
-//        }
-//        TextView restaurantTextView = findViewById(R.id.restaurantsTextView);
-//        restaurantTextView.setText(textDisplayed);
     }
 
     public class GetRestaurantsTask extends AsyncTask<URL, Void, InputSource> {
