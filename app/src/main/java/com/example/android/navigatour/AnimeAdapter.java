@@ -92,6 +92,8 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
 //            String website = data.get(position).getWebsite();
             //Get the data for restaurant and picture
             String restaurantName = data.get(position).getName();
+            String stars = data.get(position).getStars();
+
             Bitmap[] pic = data.get(position).getImageBitmap();
 
             //get the widgets
@@ -102,7 +104,7 @@ public class AnimeAdapter extends RecyclerView.Adapter<AnimeAdapter.AnimeViewHol
                 foodImageView.setImageBitmap(pic[0]);
             }
             //attach data to widgets
-            restaurantTextView.setText(restaurantName);
+            restaurantTextView.setText(restaurantName + stars);
 
         }
 
