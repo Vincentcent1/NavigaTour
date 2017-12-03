@@ -38,8 +38,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCallback,SharedPreferences.OnSharedPreferenceChangeListener {
-    SharedPreferences sharedPref;
+public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     String[] bestPath;
     int[] bestTime;
@@ -50,9 +49,6 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
     String[] chineseMarkerTitles;
     ArrayList<LatLng> locations;
     ArrayList<String> transport;
-
-    String intructionsStr;
-    String chineseInstructionsStr;
 
     // This is the Adapter being used to display the list's data
     private RecyclerView mRecyclerView;
@@ -200,21 +196,10 @@ public class TSPResultsActivity extends FragmentActivity implements OnMapReadyCa
         drawPath();
 
         // Preferences
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPref.registerOnSharedPreferenceChangeListener(this);
-
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String Chinese = getString(R.string.checkBoxChinese);
         boolean isChinese = sharedPref.getBoolean(Chinese,false);
         if(isChinese) {
-            changeLanguage(isChinese);
-        }
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if (s.equals(getString(R.string.checkBoxChinese))){
-            boolean isChinese = sharedPreferences.getBoolean(s,false);
-            Log.i("Chinese", String.valueOf(isChinese));
             changeLanguage(isChinese);
         }
     }
