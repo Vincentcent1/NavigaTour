@@ -8,18 +8,64 @@
 
     <TextView
         android:id="@+id/restaurantsTextView"
+        android:layout_marginLeft="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/locateNearby_textview"
-        android:layout_weight="1"/>
+        android:textSize="15sp"
+        android:text="Number of restaurants:"
+        />
+    <EditText
 
+        android:id="@+id/numberOfRes"
+        android:hint = "5-10"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Please indicate the radius you prefer"
+        android:textSize="15sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="8dp">
+            <RadioButton
+                android:id="@+id/distance1"
+                android:layout_width="133dp"
+                android:layout_height="wrap_content"
+                android:text="1km"
+                />
+            <RadioButton
+                android:id="@+id/distance2"
+                android:layout_width="133dp"
+                android:layout_height="wrap_content"
+                android:text="5km"
+                />
+            <RadioButton
+                android:id="@+id/distance3"
+                android:layout_width="133dp"
+                android:layout_height="wrap_content"
+                android:text="Singapore"
+                />
+        </RadioGroup>
+    </LinearLayout>
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Locate"
-        android:layout_weight="1"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:onClick="onLocateClick"/>
 </LinearLayout>
