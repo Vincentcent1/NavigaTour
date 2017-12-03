@@ -18,7 +18,8 @@
             android:textAlignment="center"
             android:text="Italian"
             android:fontFamily="casual"
-            android:paddingBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             />
 
         <ImageView
@@ -36,7 +37,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginLeft="8dp"
-            android:paddingBottom="8dp"
+            android:layout_marginBottom="24dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -64,40 +65,50 @@
             android:layout_height="wrap_content"
             android:text="Here's the description"
             android:textSize="18sp"
-            android:layout_marginLeft="8dp"
-            android:paddingBottom="8dp"/>
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="24dp"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginBottom="16dp"/>
         <TextView
             android:id="@+id/address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Here's address"
             android:textSize="18sp"
-            android:paddingBottom="8dp"
-            android:layout_marginLeft="8dp"/>
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="24dp"/>
         <TextView
             android:id="@+id/orderTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Here's the time"
             android:textSize="18sp"
-            android:layout_marginLeft="8dp"
-            android:paddingBottom="8dp"/>
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="16dp"/>
         <TextView
             android:id="@+id/averagePrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Here's the price"
             android:textSize="18sp"
-            android:layout_marginLeft="8dp"
-            android:paddingBottom="8dp"/>
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="16dp"/>
         <TextView
             android:id="@+id/website"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Here's website"
             android:textSize="18sp"
-            android:paddingBottom="8dp"
-            android:layout_marginLeft="8dp"/>
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="24dp"/>
 
 
 

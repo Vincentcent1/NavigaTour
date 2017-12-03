@@ -37,10 +37,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -261,10 +259,12 @@ public class LocateNearbyActivity extends AppCompatActivity {
                 boolean burl = false;
                 boolean bdescription = false;
                 boolean bstars = false;
+                StringBuffer stringBuffer = new StringBuffer();
 
                 public void startElement(String uri, String localName,
                                          String qName, Attributes attributes)
                         throws SAXException {
+                    stringBuffer.setLength(0);
 
 //                    System.out.println("Start Element :" + qName);
 
@@ -304,10 +304,58 @@ public class LocateNearbyActivity extends AppCompatActivity {
                 public void endElement(String uri, String localName,
                                        String qName)
                         throws SAXException {
+                    String s = stringBuffer.toString().trim();
+
 
                     if (qName.equalsIgnoreCase("POI")){
                         allData.add(individualData);
                     }
+
+                    if (qName.equalsIgnoreCase("NAME")) { //if tag equal name, it is the restaurant name
+                        individualData.put("name", s);
+                        brname = false;
+                    }
+
+                    if (qName.equalsIgnoreCase("ADDRESS")) {
+                        individualData.put("address", s);
+                        baddress = false;
+                    }
+
+                    if (qName.equalsIgnoreCase("OPENING_TIMES_LABEL")) {
+                        individualData.put("openingtimes",s);
+                        bopeningtimes = false;
+                    }
+
+                    if (qName.equalsIgnoreCase("MEAL_PRICE")) {
+                        individualData.put("mealprice",s);
+                        bmealprice = false;
+                    }
+                    if (qName.equalsIgnoreCase("WEB")){
+                        individualData.put("website",s);
+                        bweb = false;
+                    }
+                    if (qName.equalsIgnoreCase("URL_XL")){
+                        if (individualData.get("imageurl") == null) {//If it is empty, add in the imageurl String directly
+                                individualData.put("imageurl", s);
+                            } else {
+                                //if there is something, append the new imageurl behind the current imageurl separated by space
+                                String temp = individualData.get("imageurl");
+                                temp += " " + s;
+                                individualData.put("imageurl", temp);
+                            }
+                        burl = false;
+                    }
+                    if (qName.equalsIgnoreCase("DESCRIPTION")){
+                        individualData.put("description", s);
+                        bdescription = false;
+                    }
+                    if (qName.equalsIgnoreCase("MICHELIN_STARS")){
+                        Integer counter = Integer.valueOf(s);
+                        String result = new String(new char[counter]).replace("\0", "★");
+                        individualData.put("stars", result);
+                        bstars = false;
+                    }
+
 
 //                    System.out.println("End Element :" + qName);
 
@@ -316,64 +364,66 @@ public class LocateNearbyActivity extends AppCompatActivity {
                 public void characters(char ch[], int start, int length)
                         throws SAXException {
 
-//                    System.out.println(new String(ch, start, length));
+//                    System.out.println(s);
+                    stringBuffer.append(ch, start, length);
 
-
-                    if (brname) {
-                        individualData.put("name",new String(ch, start, length));
-                        System.out.println("Restaurant Name : " + new String(ch, start, length));
-                        brname = false;
-                    }
-
-                    if (baddress) {
-                        individualData.put("address", new String(ch, start, length));
-                        System.out.println("Address : "
-                                + new String(ch, start, length));
-                        baddress = false;
-                    }
-
-                    if (bopeningtimes) {
-                        individualData.put("openingtimes",new String(ch, start, length));
-                        System.out.println("Opening Times : "
-                                + new String(ch, start, length));
-                        bopeningtimes = false;
-                    }
-
-                    if (bmealprice) {
-                        individualData.put("mealprice",new String(ch, start, length));
-                        System.out.println("Meal Price : "
-                                + new String(ch, start, length));
-                        bmealprice = false;
-                    }
-
-                    if (bweb) {
-                        individualData.put("website",new String(ch, start,length));
-                        bweb = false;
-                    }
-                    if (burl){
-                        //Add all imageURLs into one String, separated by spaces.
-                        if (individualData.get("imageurl") == null){//If it is empty, add in the imageurl String directly
-                            individualData.put("imageurl", new String(ch, start, length));
-                        } else {
-                            //if there is something, append the new imageurl behind the current imageurl separated by space
-                            String temp = individualData.get("imageurl");
-                            temp += " " + new String(ch, start, length);
-                            individualData.put("imageurl", temp);
-                        }
-                        burl = false;
-                    }
-                    if (bdescription){
-                        individualData.put("description",new String(ch, start, length));
-                        bdescription = false;
-                    }
-                    if (bstars){
-                        String temp = new String(ch, start, length);
-                        Integer counter = Integer.valueOf(temp);
-                        String result = new String(new char[counter]).replace("\0", "★");
-                        individualData.put("stars",result);
-                        bstars = false;
-                    }
-
+//                    if (!s.equals("")) {
+//                        if (brname) {
+//                            individualData.put("name", s);
+//                            System.out.println("Restaurant Name : " + s);
+//                            brname = false;
+//                        }
+//
+//                        if (baddress) {
+//                            individualData.put("address", s);
+//                            System.out.println("Address : "
+//                                    + s);
+//                            baddress = false;
+//                        }
+//
+//                        if (bopeningtimes) {
+//                            individualData.put("openingtimes", s);
+//                            System.out.println("Opening Times : "
+//                                    + s);
+//                            bopeningtimes = false;
+//                        }
+//
+//                        if (bmealprice) {
+//                            individualData.put("mealprice", s);
+//                            System.out.println("Meal Price : "
+//                                    + s);
+//                            bmealprice = false;
+//                        }
+//
+//                        if (bweb) {
+//                            individualData.put("website", new String(ch, start, length));
+//                            bweb = false;
+//                        }
+//                        if (burl) {
+//                            //Add all imageURLs into one String, separated by spaces.
+//                            if (individualData.get("imageurl") == null) {//If it is empty, add in the imageurl String directly
+//                                individualData.put("imageurl", s);
+//                            } else {
+//                                //if there is something, append the new imageurl behind the current imageurl separated by space
+//                                String temp = individualData.get("imageurl");
+//                                temp += " " + s;
+//                                individualData.put("imageurl", temp);
+//                            }
+//                            burl = false;
+//                        }
+//                        if (bdescription) {
+//
+//                            individualData.put("description", s);
+//                            bdescription = false;
+//                        }
+//                        if (bstars) {
+//                            String temp = s;
+//                            Integer counter = Integer.valueOf(temp);
+//                            String result = new String(new char[counter]).replace("\0", "★");
+//                            individualData.put("stars", result);
+//                            bstars = false;
+//                        }
+//                    }
                 }
 
             };
@@ -395,38 +445,6 @@ public class LocateNearbyActivity extends AppCompatActivity {
         }
         TextView restaurantTextView = findViewById(R.id.restaurantsTextView);
         restaurantTextView.setText(textDisplayed);
-    }
-
-
-    public static String performGetCall(String requestURL) {
-        URL url;
-        String response = "";
-        try {
-
-            url = new URL(requestURL);
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(15000);
-            conn.setConnectTimeout(15000);
-            conn.setRequestMethod("GET");
-//            conn.setDoInput(true);
-            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            int responseCode=conn.getResponseCode();
-
-            if (responseCode == HttpsURLConnection.HTTP_OK) {
-                String line;
-                BufferedReader br=new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                while ((line=br.readLine()) != null) {
-                    response += line;
-                }
-            }
-            else {
-                response = null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
     }
 
     public class GetRestaurantsTask extends AsyncTask<URL, Void, InputSource> {
