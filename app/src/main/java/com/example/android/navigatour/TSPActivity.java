@@ -2,6 +2,8 @@ package com.example.android.navigatour;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,11 +29,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class TSPActivity extends AppCompatActivity {
+public class TSPActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     HashMap<String,ArrayList<HashMap<String,String>>> activitiesG;
     int minTime;
     double budgetRemaining;
-
+    SharedPreferences sharedPref;
     // Final results are stored in these arrays
     ArrayList<String> bestPath = new ArrayList<>();
     ArrayList<Double> bestCost = new ArrayList<>();
@@ -74,7 +77,32 @@ public class TSPActivity extends AppCompatActivity {
                 android.R.layout.simple_list_item_multiple_choice, attractionNames);
         attractionsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         attractionsList.setAdapter(adapter);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+        String royalTheme = getString(R.string.checkBoxYellow);
+        boolean isRoyalTheme = sharedPref.getBoolean(royalTheme,false);
+        changeTheme(isRoyalTheme);
     }
+    private void changeTheme (boolean ifTheme){
+        LinearLayout tsplayout = (LinearLayout) findViewById(R.id.tsplayout);
+        if (ifTheme){
+            //myTheme = R.style.YellowTheme;
+            tsplayout.setBackgroundResource(R.color.whiteYellow);
+
+        }else{
+            //myTheme = R.style.AppRedTheme;
+            tsplayout.setBackgroundResource(R.color.whiteRed);
+        }
+    }
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals("checkBoxYellow")){
+            boolean checked = sharedPreferences.getBoolean(s,false);
+            changeTheme(checked);
+        }
+    }
+
+
 
     public void findRoute(View view) {
         // Find all attractions the user wants to visit

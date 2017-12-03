@@ -51,7 +51,7 @@
             android:name=".TSPResultsActivity"
             android:label="@string/title_activity_tspresults" />
         <activity android:name=".SettingsActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppRedTheme"
             />
         <activity android:name=".RecyclerActivity"
             android:parentActivityName=".MainActivity"/>

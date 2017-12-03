@@ -28,11 +28,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setTheme(myTheme);
+        setTheme(myTheme);
         setContentView(R.layout.activity_main);
         bundle = savedInstanceState;
         part1 = (ImageView) findViewById(R.id.part1);
-
         part3 = (Button)findViewById(R.id.part2);
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPref.registerOnSharedPreferenceChangeListener(this);
@@ -65,9 +64,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             part1.setBackgroundResource(R.color.lightYellow);
             part3.setBackgroundResource(R.color.lightYellow);
             part3.setTextColor(getResources().getColor(R.color.royalYellow));
-
-            //super.onDestroy();
-            //super.onCreate(bundle);
+            //setContentView(R.layout.activity_main);
         }else{
             //myTheme = R.style.AppRedTheme;
             bgElement.setBackgroundResource(R.color.crimsonRed);
@@ -75,7 +72,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             part1.setScaleType(ImageView.ScaleType.CENTER_CROP);
             part3.setBackgroundResource(R.color.darkRed);
             part3.setTextColor(getResources().getColor(R.color.whiteRed));
-            //super.onDestroy();
+            //setContentView(R.layout.activity_main);
+            //super.onRestart();
             //super.onCreate(bundle);
         }
     }
@@ -83,8 +81,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (ifChinese){
             part3.setText("开启新加坡名胜之旅！");
+
         }else{
             part3.setText(R.string.function3);
+
         }
     }
     @Override
