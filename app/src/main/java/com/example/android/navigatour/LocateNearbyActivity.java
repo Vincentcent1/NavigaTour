@@ -13,7 +13,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -37,6 +36,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -44,7 +44,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.SAXParser;
@@ -83,9 +82,8 @@ public class LocateNearbyActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (true) {
-            startLocationUpdates();
-        }
+        //might consider adding if statement to check if locationclient is provided
+        startLocationUpdates();
     }
 
     @Override
@@ -229,7 +227,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
         try {
             //center: <longitude>:<Latitude>
             //Singapore: <103.85:1.29>
-            requestURL = new URL("http://apir.viamichelin.com/apir/2/findPoi.xml/RESTAURANT/eng?center=" + longitudeS + ":"+ latitudeS + "&nb=5&dist=1000&source=RESGR&filter=AGG.provider%20eq%20RESGR&charset=UTF-8&ie=UTF-8&authKey=RESTGP20171120074056040173531595");
+            requestURL = new URL("http://apir.viamichelin.com/apir/2/findPoi.xml/RESTAURANT/eng?center=" + longitudeS + ":"+ latitudeS + "&nb=10&dist=1000&source=RESGR&filter=AGG.provider%20eq%20RESGR&charset=UTF-8&ie=UTF-8&authKey=RESTGP20171120074056040173531595");
             Log.i("URL", requestURL.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -247,6 +245,7 @@ public class LocateNearbyActivity extends AppCompatActivity {
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
+
 
             DefaultHandler handler = new DefaultHandler() {
 
@@ -435,16 +434,16 @@ public class LocateNearbyActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         HashMap<String,String> restaurants = allData.get(0);
-        Iterator iterator= restaurants.keySet().iterator();
-        String textDisplayed = "";
-        while (iterator.hasNext()){
-            textDisplayed += restaurants.get(iterator.next());
-            if (iterator.hasNext()){
-                textDisplayed += "\n";
-            }
-        }
-        TextView restaurantTextView = findViewById(R.id.restaurantsTextView);
-        restaurantTextView.setText(textDisplayed);
+//        Iterator iterator= restaurants.keySet().iterator();
+//        String textDisplayed = "";
+//        while (iterator.hasNext()){
+//            textDisplayed += restaurants.get(iterator.next());
+//            if (iterator.hasNext()){
+//                textDisplayed += "\n";
+//            }
+//        }
+//        TextView restaurantTextView = findViewById(R.id.restaurantsTextView);
+//        restaurantTextView.setText(textDisplayed);
     }
 
     public class GetRestaurantsTask extends AsyncTask<URL, Void, InputSource> {
@@ -457,18 +456,25 @@ public class LocateNearbyActivity extends AppCompatActivity {
             while (!done) {
                 try {
                     HttpURLConnection conn = (HttpURLConnection) requestURL.openConnection();
-                    conn.setReadTimeout(15000);
+                    conn.setReadTimeout(30000);
                     conn.setConnectTimeout(15000);
                     conn.setRequestMethod("GET");
 //                conn.setDoInput(true);
 //                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     int responseCode = conn.getResponseCode();
 
+                    String header = "" + conn.getHeaderField(9) + " " + conn.getHeaderField(10);
+                    Log.i("HEADER",header);
+
                     if (responseCode == HttpsURLConnection.HTTP_OK) {
-                        InputStream inputStream = conn.getInputStream();
+                        InputStream inputStream = new BufferedInputStream(conn.getInputStream());
                         is = new InputSource(inputStream);
                         is.setEncoding("UTF-8");
+//                        Scanner scanner = new Scanner(inputStream);
+//                        String responsebody = scanner.useDelimiter("\\A").next();
+//                        System.out.println(responsebody);
                         done = true;
+                        parseRestaurant(is);
                     } else {
                         done = false;
                     }
@@ -479,6 +485,9 @@ public class LocateNearbyActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+
+
             }
 
             return is;
@@ -486,7 +495,6 @@ public class LocateNearbyActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(InputSource is) {
-            parseRestaurant(is);
             Intent intent = new Intent(getBaseContext(),RecyclerActivity.class);
             intent.putExtra("RESTAURANTS", allData);
             startActivity(intent);

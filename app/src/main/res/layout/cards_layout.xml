@@ -22,7 +22,7 @@
                 android:id="@+id/image_view_food"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ashketchum"
+                android:src="@drawable/michelin"
                 android:scaleType="centerCrop"/>
             <TextView
                 android:id="@+id/text_view_restaurant"
