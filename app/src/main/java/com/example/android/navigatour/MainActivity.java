@@ -2,6 +2,7 @@ package com.example.android.navigatour;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,16 +15,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     SharedPreferences sharedPref;
     Button part3;
     ImageView part1;
+    Integer myTheme = R.style.AppRedTheme;
+    Bundle bundle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setTheme(myTheme);
         setContentView(R.layout.activity_main);
+        bundle = savedInstanceState;
         part1 = (ImageView) findViewById(R.id.part1);
 
         part3 = (Button)findViewById(R.id.part2);
@@ -51,30 +58,33 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void changeTheme (boolean ifTheme){
         ConstraintLayout bgElement = (ConstraintLayout) findViewById(R.id.mylayout);
         if (ifTheme){
-            //setTheme(R.style.YellowTheme);
+            //myTheme = R.style.YellowTheme;
             bgElement.setBackgroundResource(R.color.whiteYellow);
             part1.setImageResource(R.drawable.royalmichellinstar);
             part1.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            part1.setBackgroundResource(R.color.lightYellow);
             part3.setBackgroundResource(R.color.lightYellow);
-            part3.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+            part3.setTextColor(getResources().getColor(R.color.royalYellow));
 
+            //super.onDestroy();
+            //super.onCreate(bundle);
         }else{
-            //setTheme(R.style.RedTheme);
+            //myTheme = R.style.AppRedTheme;
             bgElement.setBackgroundResource(R.color.crimsonRed);
             part1.setImageResource(R.drawable.michelinguide);
             part1.setScaleType(ImageView.ScaleType.CENTER_CROP);
             part3.setBackgroundResource(R.color.darkRed);
             part3.setTextColor(getResources().getColor(R.color.whiteRed));
+            //super.onDestroy();
+            //super.onCreate(bundle);
         }
     }
     public void changeLanguage(boolean ifChinese){
+
         if (ifChinese){
-            Log.i("Ra","inside Chinese");
             part3.setText("开启新加坡名胜之旅！");
         }else{
-            Log.i("Ra","inside English");
             part3.setText(R.string.function3);
-
         }
     }
     @Override
@@ -103,11 +113,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             //REMINDER - write code for this method
             changeFont(checked);
-        }else if (s.equals("checkBoxYellow")){
+        }
+        if (s.equals("checkBoxYellow")){
             boolean checked = sharedPreferences.getBoolean(s,false);
 
             //REMINDER - write code for this method
             changeTheme(checked);
+        }
+        if (s.equals("checkBoxChinese")){
+            boolean checked = sharedPreferences.getBoolean(s,false);
+
+            //REMINDER - write code for this method
+            changeLanguage(checked);
         }
     }
     public void startTSP(View view){
@@ -120,4 +137,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Intent intent = new Intent(this,LocateNearbyActivity.class);
         startActivity(intent);
     }
+
+
 }

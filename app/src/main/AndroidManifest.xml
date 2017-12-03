@@ -20,7 +20,7 @@
         android:theme="@style/AppRedTheme">
         <activity android:name=".MainActivity"
             android:label="Michelin"
-            android:theme="@style/RedTheme">
+            >
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,6 +29,7 @@
             </intent-filter>
         </activity>
         <activity
+
             android:name=".TSPActivity"
             android:parentActivityName=".MainActivity" />
         <activity
@@ -50,7 +51,8 @@
             android:name=".TSPResultsActivity"
             android:label="@string/title_activity_tspresults" />
         <activity android:name=".SettingsActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme"
+            />
         <activity android:name=".RecyclerActivity" />
         <activity android:name=".RestaurantInfo"></activity>
     </application>
